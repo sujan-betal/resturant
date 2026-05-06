@@ -34,20 +34,38 @@ if (!isset($_SESSION['admin_logged_in'])) {
 .btn-mark-paid {
   background: #2C7A2C; color: white;
   border: none; border-radius: 20px;
-  padding: 4px 12px; font-size: 0.75rem;
+  padding: 5px 12px; font-size: 0.75rem;
   font-weight: 700; cursor: pointer;
   transition: background 0.2s, transform 0.1s;
   white-space: nowrap;
+  margin-top: 5px;
+  display: block;
 }
-.btn-mark-paid:hover { background: #3A9A3A; transform: translateY(-1px); }
+.btn-mark-paid:hover  { background: #3A9A3A; transform: translateY(-1px); }
 .btn-mark-paid:disabled { background: #aaa; cursor: not-allowed; transform: none; }
 
 /* paid_at small text under badge */
 .paid-at { font-size: 0.68rem; color: #888; display: block; margin-top: 2px; }
 
-/* highlight rows */
-tr.row-paid   { background: #F6FFF6 !important; }
+/* row highlights */
+tr.row-paid   { background: #F0FFF0 !important; }
 tr.row-unpaid { background: #FFFEF6 !important; }
+
+/* ── Admin toast ── */
+.admin-toast {
+  position: fixed; bottom: 2rem; right: 2rem;
+  background: #1A0F0A; color: #fff;
+  padding: 0.85rem 1.5rem;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+  z-index: 99999;
+  opacity: 0; transform: translateY(20px);
+  transition: all 0.3s;
+  pointer-events: none;
+  font-family: 'DM Sans', sans-serif;
+}
+.admin-toast.show { opacity: 1; transform: translateY(0); }
 </style>
 </head>
 <body>
@@ -77,7 +95,6 @@ tr.row-unpaid { background: #FFFEF6 !important; }
       <div class="stat-card"><div class="stat-icon">💰</div><div class="stat-info"><span id="totalRevenue">-</span><p>Revenue</p></div></div>
       <div class="stat-card"><div class="stat-icon">⏳</div><div class="stat-info"><span id="pendingOrders">-</span><p>Pending</p></div></div>
       <div class="stat-card"><div class="stat-icon">📅</div><div class="stat-info"><span id="todayOrders">-</span><p>Today</p></div></div>
-      <!-- NEW: paid revenue stat -->
       <div class="stat-card"><div class="stat-icon">✅</div><div class="stat-info"><span id="paidRevenue">-</span><p>Paid Revenue</p></div></div>
     </div>
 
@@ -115,7 +132,148 @@ tr.row-unpaid { background: #FFFEF6 !important; }
   </main>
 </div>
 
+<!-- Admin toast -->
+<div class="admin-toast" id="adminToast"></div>
+
+<!-- Your existing admin.js (unchanged) -->
 <script src="js/admin.js"></script>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+//  MARK PAID — Smart injection (NO changes to admin.js needed)
+//
+//  How it works:
+//  • MutationObserver watches #ordersBody for new rows
+//  • Each new <tr> gets scanned: order ID read from col 0 (#8 → 8)
+//  • Payment status fetched from php/get_payment_status.php
+//  • Payment <td> injected at col 7 (before Time col)
+//  • Admin clicks "✅ Mark Paid" → php/mark_paid.php → DB updated
+//  • Customer's 3s poll detects 'paid' → QR modal closes → popups
+// ═══════════════════════════════════════════════════════════════
+
+/* ── Toast helper ── */
+function showAdminToast(msg, ms) {
+  ms = ms || 3500;
+  var t = document.getElementById('adminToast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._tmr);
+  t._tmr = setTimeout(function(){ t.classList.remove('show'); }, ms);
+}
+
+/* ── Mark order as Paid ── */
+function markPaid(orderId, btn) {
+  btn.disabled    = true;
+  btn.textContent = '⏳ Confirming…';
+
+  fetch('php/mark_paid.php', {
+    method : 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body   : 'order_id=' + orderId
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(data) {
+    if (data.success) {
+      // Swap badge to Paid
+      var cell = document.getElementById('payCell-' + orderId);
+      if (cell) {
+        cell.innerHTML =
+          '<span class="badge-paid">✅ Paid</span>' +
+          '<small class="paid-at">Just now</small>';
+      }
+      // Green row
+      var row = document.getElementById('adminRow-' + orderId);
+      if (row) { row.classList.remove('row-unpaid'); row.classList.add('row-paid'); }
+
+      btn.remove();
+      showAdminToast('💚 Order #' + orderId + ' marked PAID — customer notified!', 4000);
+    } else {
+      btn.disabled    = false;
+      btn.textContent = '✅ Mark Paid';
+      showAdminToast('❌ Failed. Try again.');
+    }
+  })
+  .catch(function(err) {
+    btn.disabled    = false;
+    btn.textContent = '✅ Mark Paid';
+    showAdminToast('❌ Network error. Try again.');
+    console.error(err);
+  });
+}
+
+/* ════════════════════════════════════════════════════════
+   CORE: injectPaymentCells()
+   ────────────────────────────────────────────────────────
+   Scans every <tr> in #ordersBody.
+   Reads Order ID from the FIRST cell text (e.g. "#8" → 8).
+   Skips rows that already have a payment cell injected.
+   Inserts payment <td> at position 7 (before Time column).
+   Fetches current payment status from DB for each new row.
+════════════════════════════════════════════════════════ */
+function injectPaymentCells() {
+  var rows = document.querySelectorAll('#ordersBody tr');
+
+  rows.forEach(function(row) {
+    // Skip colspan rows (loading/empty states)
+    var cells = row.querySelectorAll('td');
+    if (cells.length < 9) return;
+
+    // Skip if we already processed this row
+    if (row.dataset.payInjected === '1') return;
+    row.dataset.payInjected = '1';
+
+    // Read Order ID from first cell: "#8" → 8
+    var idText  = cells[0].textContent.trim().replace('#', '');
+    var orderId = parseInt(idText, 10);
+    if (!orderId || isNaN(orderId)) return;
+
+    // Tag row for later targeting
+    row.id = 'adminRow-' + orderId;
+
+    // Create placeholder payment cell (pending by default)
+    var td  = document.createElement('td');
+    td.id   = 'payCell-' + orderId;
+    td.innerHTML =
+      '<span class="badge-unpaid">⏳ Pending</span><br>' +
+      '<button class="btn-mark-paid" onclick="markPaid(' + orderId + ', this)">✅ Mark Paid</button>';
+    row.classList.add('row-unpaid');
+
+    // Insert at index 7 (before Time column, after Status)
+    var refCell = cells[7]; // 0-based: 7 = 8th cell = Time col
+    row.insertBefore(td, refCell);
+
+    // Check real payment status from DB asynchronously
+    fetch('php/get_payment_status.php?order_id=' + orderId)
+    .then(function(r){ return r.json(); })
+    .then(function(d) {
+      if (d.payment === 'paid') {
+        td.innerHTML =
+          '<span class="badge-paid">✅ Paid</span>';
+        row.classList.remove('row-unpaid');
+        row.classList.add('row-paid');
+      }
+    })
+    .catch(function(){});
+  });
+}
+
+/* ── Watch #ordersBody for new rows from admin.js ── */
+(function() {
+  var tbody = document.getElementById('ordersBody');
+  if (!tbody) return;
+
+  var observer = new MutationObserver(function() {
+    injectPaymentCells();
+  });
+  observer.observe(tbody, { childList: true, subtree: true });
+
+  // Also run after load (in case rows already rendered)
+  window.addEventListener('load', function() {
+    setTimeout(injectPaymentCells, 500);
+    setTimeout(injectPaymentCells, 1500); // retry for slow renders
+  });
+})();
+</script>
 
 </body>
 </html>

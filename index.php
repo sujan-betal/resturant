@@ -65,21 +65,71 @@
   padding: 0.5rem 1rem;
   font-size: 0.85rem;
   color: #2C1810;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.2rem;
   word-break: break-all;
 }
 .pm-upi-id strong { display: block; font-size: 0.75rem; color: #8B6355; margin-bottom: 2px; }
 
-.pm-btn-done {
-  width: 100%;
-  padding: 0.85rem;
-  background: #2C7A2C; color: white;
-  border: none; border-radius: 50px;
-  font-weight: 700; font-size: 1rem;
-  cursor: pointer; transition: background 0.2s;
+/* ── Waiting spinner (replaces close button) ── */
+.pm-waiting {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  font-size: 0.85rem;
+  color: #8B6355;
+  margin-bottom: 1rem;
 }
-.pm-btn-done:hover { background: #3A9A3A; }
-.pm-order-ref { font-size: 0.78rem; color: #bbb; margin-top: 1rem; }
+.pm-spinner {
+  width: 16px; height: 16px;
+  border: 2px solid #EDD8C8;
+  border-top-color: #C8460A;
+  border-radius: 50%;
+  animation: spin 0.9s linear infinite;
+  flex-shrink: 0;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.pm-order-ref { font-size: 0.78rem; color: #bbb; margin-top: 0.5rem; }
+
+/* ── Success overlay popups ── */
+.success-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.55);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 99999;
+  animation: soFadeIn 0.3s ease;
+}
+.success-box {
+  background: #fff;
+  border-radius: 24px;
+  padding: 3rem 2.5rem;
+  text-align: center;
+  max-width: 380px; width: 90%;
+  box-shadow: 0 30px 80px rgba(0,0,0,0.3);
+  animation: soPopIn 0.4s cubic-bezier(0.34,1.56,0.64,1);
+}
+.success-box .sb-icon {
+  font-size: 4rem;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+.success-box h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.7rem;
+  color: #1A0F0A;
+  margin-bottom: 0.5rem;
+}
+.success-box p {
+  color: #8B6355;
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+@keyframes soFadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes soPopIn  {
+  from { transform: scale(0.7); opacity: 0; }
+  to   { transform: scale(1);   opacity: 1; }
+}
 </style>
 </head>
 <body>
@@ -186,35 +236,42 @@
   </div>
 </div>
 
-<!-- PAYMENT QR MODAL -->
+<!-- ═══════════════════════════════════════════════
+     PAYMENT QR MODAL
+     No close button — closes only when admin confirms
+     ═══════════════════════════════════════════════ -->
 <div class="payment-modal-overlay" id="paymentModal">
   <div class="payment-modal">
+
     <div class="pm-icon">📱</div>
     <h2>Pay to Confirm</h2>
-    <p class="pm-sub">Scan the QR code below to complete payment</p>
+    <p class="pm-sub">Scan the QR code below to complete your payment</p>
 
     <div class="pm-amount" id="pmAmount">₹0</div>
 
-    <!-- QR code renders here -->
+    <!-- QR code / static image renders here -->
     <div id="qrContainer"></div>
 
     <div class="pm-upi-id">
       <strong>UPI ID</strong>
-      <span id="pmUpiId">spiceandsoul@upi</span>
+      <span id="pmUpiId">sujanbetal18-1@okaxis</span>
     </div>
 
     <p class="pm-note">
       Open any UPI app (GPay, PhonePe, Paytm, etc.),<br>
-      scan this QR &amp; pay <strong id="pmAmountSmall">₹0</strong>.
+      scan this QR &amp; pay <strong id="pmAmountSmall">₹0</strong>.<br>
       Show the screenshot to your server.<br>
-      Admin will mark your order as <strong>Paid ✅</strong>.
+      Admin will verify &amp; confirm your order ✅
     </p>
 
-    <button class="pm-btn-done" onclick="closePaymentModal()" style="background: #dc3545;">
-      ✖ Close
-    </button>
+    <!-- Waiting indicator — NO close/cancel button -->
+    <div class="pm-waiting">
+      <span class="pm-spinner"></span>
+      Waiting for admin to confirm payment…
+    </div>
 
     <p class="pm-order-ref" id="pmOrderRef">Order #—</p>
+
   </div>
 </div>
 
@@ -227,66 +284,130 @@
 
 <!-- QR code library -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-<!-- Link to your app.js which handles cart and form submission -->
+<!-- Main app logic -->
 <script src="js/app.js"></script>
 
 <script>
-// ═══════════════════════════════════════════════════
-//  AUTOMATIC PAYMENT VERIFICATION LOGIC (Polling)
-// ═══════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════
+//  PAYMENT & SUCCESS FLOW
+//  Flow:
+//    1. showPaymentQR()  → opens QR modal, starts polling
+//    2. Admin marks paid → check_status.php returns "paid"
+//    3. QR modal closes automatically
+//    4. Popup 1: "Payment Confirmed ✅"  (auto-dismiss 1.8s)
+//    5. Popup 2: "Order Placed 🎉"       (auto-dismiss 2.5s)
+//    6. Cart clears
+// ═══════════════════════════════════════════════════════════════
 
-let paymentCheckTimer; // Timer ko store karne ke liye
+let paymentCheckTimer = null;
 
+/* ── Step 1: Open QR modal & start polling ── */
 function showPaymentQR(orderId, totalAmount) {
-  document.getElementById('pmAmount').textContent      = '₹' + parseFloat(totalAmount).toFixed(2);
-  document.getElementById('pmAmountSmall').textContent = '₹' + parseFloat(totalAmount).toFixed(2);
+  // Fill in amount
+  const amt = '₹' + parseFloat(totalAmount).toFixed(2);
+  document.getElementById('pmAmount').textContent      = amt;
+  document.getElementById('pmAmountSmall').textContent = amt;
   document.getElementById('pmOrderRef').textContent    = 'Order #' + orderId;
-  document.getElementById('pmUpiId').textContent       = 'sujanbetal18-1@okaxis'; 
+  document.getElementById('pmUpiId').textContent       = 'sujanbetal18-1@okaxis';
 
+  // Show QR image (replace with your static qr.jpeg or dynamic QR)
   const qrBox = document.getElementById('qrContainer');
-  qrBox.innerHTML = `<img src="qr.jpeg" alt="Scan to Pay" style="width: 100%; height: 100%; object-fit: contain; border-radius: 8px;">`;
+  qrBox.innerHTML = `
+    <img
+      src="qr.jpeg"
+      alt="Scan to Pay"
+      style="width:100%;height:100%;object-fit:contain;border-radius:8px;"
+    >`;
 
+  // Open modal — customer cannot close it manually
   document.getElementById('paymentModal').classList.add('open');
 
-  // 🔴 MAGIC START: Har 3 second mein check karega ki Admin ne "Mark Paid" kiya ya nahi
+  // Clear any previous timer
+  if (paymentCheckTimer) clearInterval(paymentCheckTimer);
+
+  // Poll every 3 seconds for admin confirmation
   paymentCheckTimer = setInterval(async () => {
     try {
-      const response = await fetch(`php/check_status.php?order_id=${orderId}`);
-      const data = await response.json();
+      const res  = await fetch(`php/check_status.php?order_id=${orderId}`);
+      const data = await res.json();
 
       if (data.status === 'paid') {
-        // Agar Admin ne verify kar diya hai!
-        clearInterval(paymentCheckTimer); // Timer band karo
-        showPaymentSuccess(); // Success popup dikhao
+        clearInterval(paymentCheckTimer);
+        paymentCheckTimer = null;
+        handlePaymentConfirmed(); // 🎉 trigger success flow
       }
     } catch (err) {
-      console.log("Checking status...", err);
+      // Network hiccup — keep polling silently
+      console.log('Polling payment status…', err);
     }
-  }, 3000); // 3000 ms = 3 Seconds
+  }, 3000); // check every 3 seconds
 }
 
-// Jab background mein payment verify ho jaye
-function showPaymentSuccess() {
-  // Modal band karo
+/* ── Step 2–6: Admin confirmed → run success flow ── */
+function handlePaymentConfirmed() {
+  // Close QR modal
   document.getElementById('paymentModal').classList.remove('open');
-  
-  // Success message dikhao
-  if (typeof showToast === 'function') {
-    showToast('🎉 Payment Done Successfully! Your food is being prepared.');
-  } else {
-    alert('🎉 Payment Done Successfully! Your food is being prepared.');
-  }
+
+  // Popup 1 — Payment Confirmed
+  showSuccessPopup(
+    '✅',
+    'Payment Confirmed!',
+    'Your payment has been received successfully.',
+    () => {
+      // Popup 2 — Order Placed (shown after popup 1 fades)
+      showSuccessPopup(
+        '🎉',
+        'Order Placed!',
+        'Your order is confirmed and our chefs are already cooking. Sit tight!',
+        () => {
+          // After both popups: clear cart
+          if (typeof clearCart === 'function') clearCart();
+        },
+        2500 // popup 2 stays for 2.5s
+      );
+    },
+    1800 // popup 1 stays for 1.8s
+  );
 }
 
-// Agar customer ✕ dabakar khud modal band karta hai
-function closePaymentModal() {
-  document.getElementById('paymentModal').classList.remove('open');
-  
-  // Timer rok do warna background mein check karta rahega
-  if (paymentCheckTimer) {
-    clearInterval(paymentCheckTimer);
-  }
+/* ── Generic animated popup helper ──
+   icon       : emoji string
+   title      : heading text
+   message    : body text
+   onClose    : callback fired after popup fully disappears
+   autoCloseMs: milliseconds before auto-dismiss
+*/
+function showSuccessPopup(icon, title, message, onClose, autoCloseMs) {
+  // Remove any existing popup cleanly
+  const existing = document.getElementById('dynamicSuccessOverlay');
+  if (existing) existing.remove();
+
+  // Build overlay
+  const overlay = document.createElement('div');
+  overlay.id        = 'dynamicSuccessOverlay';
+  overlay.className = 'success-overlay';
+  overlay.innerHTML = `
+    <div class="success-box">
+      <span class="sb-icon">${icon}</span>
+      <h2>${title}</h2>
+      <p>${message}</p>
+    </div>`;
+  document.body.appendChild(overlay);
+
+  // Auto-dismiss after delay, fire callback
+  setTimeout(() => {
+    overlay.style.opacity    = '0';
+    overlay.style.transition = 'opacity 0.4s';
+    setTimeout(() => {
+      overlay.remove();
+      if (typeof onClose === 'function') onClose();
+    }, 400); // wait for fade-out
+  }, autoCloseMs || 2000);
 }
+
+// NOTE: closePaymentModal() is intentionally NOT defined.
+// The QR modal has no close button and can only be
+// dismissed programmatically when admin confirms payment.
 </script>
 
 </body>
