@@ -1,50 +1,36 @@
 <?php
-// php/mark_paid.php
+// php/mark_paid.php — Mark an order as paid (called by admin panel)
+
+session_start();
 header('Content-Type: application/json');
 
-// ── Direct DB connection (no dependency on connect.php variable name) ──
-$host   = "localhost";
-$user   = "root";
-$pass   = "";             // XAMPP default = empty password
-$dbname = "restaurant_db"; // ← your database name (check phpMyAdmin if unsure)
-
-$conn = new mysqli($host, $user, $pass, $dbname);
-
-if ($conn->connect_error) {
-    echo json_encode([
-        'success' => false,
-        'error'   => 'DB failed: ' . $conn->connect_error
-    ]);
+// Only logged-in admins
+if (!isset($_SESSION['admin_logged_in'])) {
+    http_response_code(403);
+    echo json_encode(['success' => false, 'error' => 'Unauthorized']);
     exit;
 }
 
-// ── Validate POST ──
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    echo json_encode(['success' => false, 'error' => 'POST required']);
-    exit;
-}
+require_once 'connect.php';
 
-$order_id = intval($_POST['order_id'] ?? 0);
+$order_id = isset($_POST['order_id']) ? intval($_POST['order_id']) : 0;
+
 if ($order_id <= 0) {
-    echo json_encode(['success' => false, 'error' => 'Invalid order_id: ' . $order_id]);
+    echo json_encode(['success' => false, 'error' => 'Invalid order ID']);
     exit;
 }
 
-// ── Auto-add payment column if missing ──
-$conn->query("ALTER TABLE orders ADD COLUMN IF NOT EXISTS payment VARCHAR(20) DEFAULT 'pending'");
+$stmt = $pdo->prepare("
+    UPDATE orders
+    SET payment_status = 'paid',
+        payment_method = 'UPI',
+        paid_at = NOW()
+    WHERE id = ?
+");
+$stmt->execute([$order_id]);
 
-// ── Mark as paid ──
-$stmt = $conn->prepare("UPDATE orders SET payment = 'paid' WHERE id = ?");
-if (!$stmt) {
-    echo json_encode(['success' => false, 'error' => 'Prepare failed: ' . $conn->error]);
-    exit;
+if ($stmt->rowCount() > 0) {
+    echo json_encode(['success' => true, 'message' => 'Order marked as paid']);
+} else {
+    echo json_encode(['success' => false, 'error' => 'Order not found or already paid']);
 }
-
-$stmt->bind_param("i", $order_id);
-$stmt->execute();
-
-echo json_encode(['success' => true, 'order_id' => $order_id]);
-
-$stmt->close();
-$conn->close();
-?>

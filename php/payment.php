@@ -1,5 +1,5 @@
 <?php
-// php/payment.php  — Mark an order as paid
+// php/payment.php — Mark an order as paid
 // Called by admin panel: POST with order_id
 
 session_start();

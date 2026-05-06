@@ -66,6 +66,64 @@ tr.row-unpaid { background: #FFFEF6 !important; }
   font-family: 'DM Sans', sans-serif;
 }
 .admin-toast.show { opacity: 1; transform: translateY(0); }
+
+/* ── Logout Confirmation Modal ── */
+.logout-modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.55);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 999999;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.25s;
+}
+.logout-modal-overlay.open {
+  opacity: 1; pointer-events: all;
+}
+.logout-modal {
+  background: #fff;
+  border-radius: 20px;
+  padding: 2.5rem 2rem;
+  max-width: 380px; width: 90%;
+  text-align: center;
+  box-shadow: 0 30px 80px rgba(0,0,0,0.35);
+  transform: scale(0.85) translateY(10px);
+  transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+  font-family: 'DM Sans', sans-serif;
+}
+.logout-modal-overlay.open .logout-modal {
+  transform: scale(1) translateY(0);
+}
+.logout-modal .lm-icon { font-size: 3rem; display: block; margin-bottom: 0.5rem; }
+.logout-modal h3 {
+  font-size: 1.4rem; font-weight: 700;
+  color: #1A0F0A; margin-bottom: 0.4rem;
+}
+.logout-modal p {
+  color: #8B6355; font-size: 0.9rem;
+  margin-bottom: 1.8rem; line-height: 1.5;
+}
+.logout-modal-actions {
+  display: flex; gap: 0.8rem; justify-content: center;
+}
+.lm-btn {
+  flex: 1; max-width: 140px;
+  padding: 0.75rem 1rem;
+  border-radius: 50px;
+  font-size: 0.9rem; font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+  border: none;
+  font-family: 'DM Sans', sans-serif;
+}
+.lm-btn:hover { transform: translateY(-1px); }
+.lm-btn-cancel {
+  background: #F0EBE7; color: #2C1810;
+}
+.lm-btn-cancel:hover { background: #E5DDD7; }
+.lm-btn-confirm {
+  background: #C8460A; color: white;
+}
+.lm-btn-confirm:hover { background: #E85D1E; }
 </style>
 </head>
 <body>
@@ -78,7 +136,8 @@ tr.row-unpaid { background: #FFFEF6 !important; }
       <a href="#" class="nav-item active" onclick="showTab('orders')">📋 Orders</a>
       <a href="#" class="nav-item" onclick="showTab('menu')">🍛 Menu Items</a>
       <a href="index.php" class="nav-item">🌐 View Site</a>
-      <a href="#" class="nav-item logout-item" onclick="logout()">🚪 Logout</a>
+      <!-- FIX: calls showLogoutConfirm() instead of logout() directly -->
+      <a href="#" class="nav-item logout-item" onclick="showLogoutConfirm()">🚪 Logout</a>
     </nav>
   </aside>
 
@@ -135,20 +194,25 @@ tr.row-unpaid { background: #FFFEF6 !important; }
 <!-- Admin toast -->
 <div class="admin-toast" id="adminToast"></div>
 
+<!-- ── Logout Confirmation Modal ── -->
+<div class="logout-modal-overlay" id="logoutModal">
+  <div class="logout-modal">
+    <span class="lm-icon">🚪</span>
+    <h3>Confirm Logout</h3>
+    <p>Are you sure you want to logout<br>from the admin panel?</p>
+    <div class="logout-modal-actions">
+      <button class="lm-btn lm-btn-cancel" onclick="closeLogoutConfirm()">Cancel</button>
+      <button class="lm-btn lm-btn-confirm" onclick="confirmLogout()">Yes, Logout</button>
+    </div>
+  </div>
+</div>
+
 <!-- Your existing admin.js (unchanged) -->
 <script src="js/admin.js"></script>
 
 <script>
 // ═══════════════════════════════════════════════════════════════
 //  MARK PAID — Smart injection (NO changes to admin.js needed)
-//
-//  How it works:
-//  • MutationObserver watches #ordersBody for new rows
-//  • Each new <tr> gets scanned: order ID read from col 0 (#8 → 8)
-//  • Payment status fetched from php/get_payment_status.php
-//  • Payment <td> injected at col 7 (before Time col)
-//  • Admin clicks "✅ Mark Paid" → php/mark_paid.php → DB updated
-//  • Customer's 3s poll detects 'paid' → QR modal closes → popups
 // ═══════════════════════════════════════════════════════════════
 
 /* ── Toast helper ── */
@@ -161,12 +225,15 @@ function showAdminToast(msg, ms) {
   t._tmr = setTimeout(function(){ t.classList.remove('show'); }, ms);
 }
 
-/* ── Mark order as Paid ── */
+/* ── Mark order as Paid ──
+   FIX: Changed URL from 'php/mark_paid.php' → 'php/payment.php'
+   (payment.php lives in the php/ folder per its own comment header)
+*/
 function markPaid(orderId, btn) {
   btn.disabled    = true;
   btn.textContent = '⏳ Confirming…';
 
-  fetch('php/mark_paid.php', {
+  fetch('php/payment.php', {                          // ← FIXED path
     method : 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body   : 'order_id=' + orderId
@@ -174,14 +241,12 @@ function markPaid(orderId, btn) {
   .then(function(r){ return r.json(); })
   .then(function(data) {
     if (data.success) {
-      // Swap badge to Paid
       var cell = document.getElementById('payCell-' + orderId);
       if (cell) {
         cell.innerHTML =
           '<span class="badge-paid">✅ Paid</span>' +
           '<small class="paid-at">Just now</small>';
       }
-      // Green row
       var row = document.getElementById('adminRow-' + orderId);
       if (row) { row.classList.remove('row-unpaid'); row.classList.add('row-paid'); }
 
@@ -190,7 +255,7 @@ function markPaid(orderId, btn) {
     } else {
       btn.disabled    = false;
       btn.textContent = '✅ Mark Paid';
-      showAdminToast('❌ Failed. Try again.');
+      showAdminToast('❌ Failed: ' + (data.error || 'Try again.'));
     }
   })
   .catch(function(err) {
@@ -203,34 +268,22 @@ function markPaid(orderId, btn) {
 
 /* ════════════════════════════════════════════════════════
    CORE: injectPaymentCells()
-   ────────────────────────────────────────────────────────
-   Scans every <tr> in #ordersBody.
-   Reads Order ID from the FIRST cell text (e.g. "#8" → 8).
-   Skips rows that already have a payment cell injected.
-   Inserts payment <td> at position 7 (before Time column).
-   Fetches current payment status from DB for each new row.
 ════════════════════════════════════════════════════════ */
 function injectPaymentCells() {
   var rows = document.querySelectorAll('#ordersBody tr');
 
   rows.forEach(function(row) {
-    // Skip colspan rows (loading/empty states)
     var cells = row.querySelectorAll('td');
     if (cells.length < 9) return;
-
-    // Skip if we already processed this row
     if (row.dataset.payInjected === '1') return;
     row.dataset.payInjected = '1';
 
-    // Read Order ID from first cell: "#8" → 8
     var idText  = cells[0].textContent.trim().replace('#', '');
     var orderId = parseInt(idText, 10);
     if (!orderId || isNaN(orderId)) return;
 
-    // Tag row for later targeting
     row.id = 'adminRow-' + orderId;
 
-    // Create placeholder payment cell (pending by default)
     var td  = document.createElement('td');
     td.id   = 'payCell-' + orderId;
     td.innerHTML =
@@ -238,17 +291,15 @@ function injectPaymentCells() {
       '<button class="btn-mark-paid" onclick="markPaid(' + orderId + ', this)">✅ Mark Paid</button>';
     row.classList.add('row-unpaid');
 
-    // Insert at index 7 (before Time column, after Status)
-    var refCell = cells[7]; // 0-based: 7 = 8th cell = Time col
+    var refCell = cells[7];
     row.insertBefore(td, refCell);
 
-    // Check real payment status from DB asynchronously
+    // FIX: Also using correct path for get_payment_status
     fetch('php/get_payment_status.php?order_id=' + orderId)
     .then(function(r){ return r.json(); })
     .then(function(d) {
       if (d.payment === 'paid') {
-        td.innerHTML =
-          '<span class="badge-paid">✅ Paid</span>';
+        td.innerHTML = '<span class="badge-paid">✅ Paid</span>';
         row.classList.remove('row-unpaid');
         row.classList.add('row-paid');
       }
@@ -257,7 +308,7 @@ function injectPaymentCells() {
   });
 }
 
-/* ── Watch #ordersBody for new rows from admin.js ── */
+/* ── Watch #ordersBody for new rows ── */
 (function() {
   var tbody = document.getElementById('ordersBody');
   if (!tbody) return;
@@ -267,12 +318,45 @@ function injectPaymentCells() {
   });
   observer.observe(tbody, { childList: true, subtree: true });
 
-  // Also run after load (in case rows already rendered)
   window.addEventListener('load', function() {
     setTimeout(injectPaymentCells, 500);
-    setTimeout(injectPaymentCells, 1500); // retry for slow renders
+    setTimeout(injectPaymentCells, 1500);
   });
 })();
+
+/* ════════════════════════════════════════════════════════
+   LOGOUT CONFIRMATION
+════════════════════════════════════════════════════════ */
+function showLogoutConfirm() {
+  document.getElementById('logoutModal').classList.add('open');
+}
+
+function closeLogoutConfirm() {
+  document.getElementById('logoutModal').classList.remove('open');
+}
+
+function confirmLogout() {
+  // Close modal first, then redirect to logout endpoint
+  closeLogoutConfirm();
+  // Small delay so the modal close animation plays
+  setTimeout(function() {
+    if (typeof logout === 'function') {
+      logout(); // call admin.js logout if defined
+    } else {
+      window.location.href = 'php/auth.php?action=logout';
+    }
+  }, 250);
+}
+
+// Close modal on overlay click (outside the box)
+document.getElementById('logoutModal').addEventListener('click', function(e) {
+  if (e.target === this) closeLogoutConfirm();
+});
+
+// Close on Escape key
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeLogoutConfirm();
+});
 </script>
 
 </body>

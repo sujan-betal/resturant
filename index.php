@@ -139,6 +139,7 @@
   <div class="nav-brand">🍽 Spice &amp; Soul</div>
   <div class="nav-links">
     <a href="#menu">Menu</a>
+    <a href="history.php">📋 My Orders</a>
     <a href="#about">About</a>
     <button class="cart-btn" onclick="toggleCart()">
       🛒 Cart <span class="cart-count" id="cartCount">0</span>
