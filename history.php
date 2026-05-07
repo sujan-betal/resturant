@@ -120,12 +120,31 @@ body {
 .state-box h3 { font-size: 1.2rem; margin-bottom: 0.3rem; color: var(--brand-dk); }
 .state-box p  { font-size: 0.9rem; }
 
-/* ── Order card ── */
+/* ── Live indicator bar ── */
+.live-bar {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 1rem;
+  flex-wrap: wrap; gap: 0.4rem;
+}
 .orders-found {
   font-size: 0.85rem; color: var(--brand-md);
-  margin-bottom: 1rem; font-weight: 500;
+  font-weight: 500;
+}
+.live-dot-wrap {
+  display: flex; align-items: center; gap: 0.4rem;
+  font-size: 0.75rem; color: #aaa;
+}
+.live-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: #28a745;
+  animation: livePulse 2s ease-in-out infinite;
+}
+@keyframes livePulse {
+  0%,100% { opacity: 1; transform: scale(1); }
+  50%      { opacity: 0.4; transform: scale(0.8); }
 }
 
+/* ── Order card ── */
 .order-card {
   background: #fff;
   border-radius: 16px;
@@ -134,6 +153,7 @@ body {
   overflow: hidden;
   box-shadow: 0 4px 20px rgba(0,0,0,0.06);
   animation: cardIn 0.3s ease both;
+  transition: border-color 0.4s;
 }
 @keyframes cardIn {
   from { opacity: 0; transform: translateY(12px); }
@@ -142,6 +162,12 @@ body {
 .order-card:nth-child(2) { animation-delay: 0.05s; }
 .order-card:nth-child(3) { animation-delay: 0.10s; }
 .order-card:nth-child(4) { animation-delay: 0.15s; }
+
+/* Card flash when status updates */
+.order-card.status-changed {
+  border-color: #28a745;
+  box-shadow: 0 0 0 3px rgba(40,167,69,0.15);
+}
 
 .card-head {
   padding: 1.1rem 1.4rem;
@@ -161,6 +187,7 @@ body {
   padding: 4px 12px; border-radius: 20px;
   font-size: 0.72rem; font-weight: 700;
   text-transform: uppercase; letter-spacing: 0.5px;
+  transition: all 0.3s;
 }
 .badge-pending    { background:#FFF3CD; color:#856404; border:1px solid #FFE69C; }
 .badge-preparing  { background:#CCE5FF; color:#004085; border:1px solid #B8DAFF; }
@@ -168,6 +195,17 @@ body {
 .badge-cancelled  { background:#F8D7DA; color:#721C24; border:1px solid #F5C6CB; }
 .badge-paid       { background:#D4EDDA; color:#155724; border:1px solid #C3E6CB; }
 .badge-unpaid     { background:#FFF3CD; color:#856404; border:1px solid #FFE69C; }
+
+/* ── Badge pulse animation on update ── */
+@keyframes badgePop {
+  0%   { transform: scale(1); }
+  30%  { transform: scale(1.2); }
+  60%  { transform: scale(0.95); }
+  100% { transform: scale(1); }
+}
+.badge-updated {
+  animation: badgePop 0.5s ease;
+}
 
 .card-body-inner { padding: 1.1rem 1.4rem; }
 
@@ -215,6 +253,25 @@ body {
   margin: 0 auto 1rem;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Status update toast ── */
+.status-toast {
+  position: fixed; bottom: 1.5rem; left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: #1A0F0A; color: #fff;
+  padding: 0.7rem 1.4rem;
+  border-radius: 50px;
+  font-size: 0.85rem; font-weight: 600;
+  z-index: 99999;
+  opacity: 0;
+  transition: all 0.35s;
+  white-space: nowrap;
+  pointer-events: none;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+}
+.status-toast.show {
+  opacity: 1; transform: translateX(-50%) translateY(0);
+}
 </style>
 </head>
 <body>
@@ -258,17 +315,33 @@ body {
   </div>
 </div>
 
+<!-- Status update toast -->
+<div class="status-toast" id="statusToast"></div>
+
 <script>
+// ══════════════════════════════════════════════════════
+//  LIVE STATUS POLLING — updates without page refresh
+// ══════════════════════════════════════════════════════
+
+let pollTimer   = null;    // interval handle
+let liveOrders  = [];      // latest known order data
+let currentPhone = '';     // phone used for last search
+
+const STATUS_INFO = {
+  pending   : { cls: 'badge-pending',   icon: '⏳', label: 'Pending'   },
+  preparing : { cls: 'badge-preparing', icon: '👨‍🍳', label: 'Preparing' },
+  served    : { cls: 'badge-served',    icon: '✅', label: 'Served'    },
+  cancelled : { cls: 'badge-cancelled', icon: '❌', label: 'Cancelled' },
+};
+
+/* ── Search orders (called by button) ── */
 async function searchOrders() {
   const phone = document.getElementById('phoneInput').value.trim();
   const results = document.getElementById('results');
+  if (!phone) { document.getElementById('phoneInput').focus(); return; }
 
-  if (!phone) {
-    document.getElementById('phoneInput').focus();
-    return;
-  }
+  stopPolling(); // stop any existing poll
 
-  // Loading state
   results.innerHTML = `
     <div class="state-box">
       <div class="spinner"></div>
@@ -290,10 +363,10 @@ async function searchOrders() {
       return;
     }
 
-    const orders = data.orders;
-    results.innerHTML =
-      `<p class="orders-found">Found ${orders.length} order${orders.length>1?'s':''} for ${escHtml(phone)}</p>` +
-      orders.map(renderOrder).join('');
+    currentPhone = phone;
+    liveOrders   = data.orders;
+    renderAllOrders();
+    startPolling();                      // ← begin live updates
 
   } catch (err) {
     results.innerHTML = `
@@ -305,28 +378,125 @@ async function searchOrders() {
   }
 }
 
+/* ── Render all orders into the results div ── */
+function renderAllOrders() {
+  const results = document.getElementById('results');
+  results.innerHTML =
+    `<div class="live-bar">
+       <p class="orders-found">Found ${liveOrders.length} order${liveOrders.length > 1 ? 's' : ''} for ${escHtml(currentPhone)}</p>
+       <div class="live-dot-wrap">
+         <span class="live-dot"></span>
+         <span id="liveLabel">Live updates on</span>
+       </div>
+     </div>` +
+    liveOrders.map(renderOrder).join('');
+}
+
+/* ── Start polling every 5 seconds ── */
+function startPolling() {
+  if (pollTimer) clearInterval(pollTimer);
+  pollTimer = setInterval(pollStatuses, 5000);
+}
+
+/* ── Stop polling ── */
+function stopPolling() {
+  if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
+  currentPhone = '';
+  liveOrders   = [];
+}
+
+/* ── Poll: fetch latest statuses and diff ── */
+async function pollStatuses() {
+  if (!currentPhone) return;
+  try {
+    const res  = await fetch('php/order_history.php?phone=' + encodeURIComponent(currentPhone) + '&_t=' + Date.now());
+    const data = await res.json();
+    if (!data.success) return;
+
+    data.orders.forEach(fresh => {
+      const old = liveOrders.find(o => o.id === fresh.id);
+      if (!old) return;
+
+      let changed = false;
+
+      // ── Order status changed? ──
+      if (old.status !== fresh.status) {
+        old.status = fresh.status;
+        changed = true;
+        applyStatusBadge('statusBadge-' + fresh.id, fresh.status);
+        flashCard(fresh.id);
+        showStatusToast('Order #' + fresh.id + ' is now ' + (STATUS_INFO[fresh.status]?.icon || '') + ' ' + (fresh.status.charAt(0).toUpperCase() + fresh.status.slice(1)));
+      }
+
+      // ── Payment status changed? ──
+      if (old.payment_status !== fresh.payment_status) {
+        old.payment_status = fresh.payment_status;
+        old.paid_at        = fresh.paid_at;
+        changed = true;
+        applyPaymentBadge('payBadge-' + fresh.id, fresh.payment_status);
+        if (fresh.paid_at) {
+          const el = document.getElementById('paidAt-' + fresh.id);
+          if (el) el.textContent = 'Paid at ' + formatDate(fresh.paid_at);
+        }
+        if (fresh.payment_status === 'paid') {
+          showStatusToast('💚 Payment confirmed for Order #' + fresh.id);
+        }
+      }
+    });
+
+  } catch(e) {
+    // network hiccup — keep polling silently
+  }
+}
+
+/* ── Update status badge in DOM ── */
+function applyStatusBadge(id, status) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const info = STATUS_INFO[status] || STATUS_INFO.pending;
+  el.className = 'badge ' + info.cls + ' badge-updated';
+  el.innerHTML = info.icon + ' ' + info.label;
+  setTimeout(() => el.classList.remove('badge-updated'), 600);
+}
+
+/* ── Update payment badge in DOM ── */
+function applyPaymentBadge(id, payStatus) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const isPaid = payStatus === 'paid';
+  el.className = 'badge ' + (isPaid ? 'badge-paid' : 'badge-unpaid') + ' badge-updated';
+  el.innerHTML = (isPaid ? '✅ Paid' : '⏳ Unpaid');
+  setTimeout(() => el.classList.remove('badge-updated'), 600);
+}
+
+/* ── Flash card border green on any change ── */
+function flashCard(orderId) {
+  const card = document.getElementById('orderCard-' + orderId);
+  if (!card) return;
+  card.classList.add('status-changed');
+  setTimeout(() => card.classList.remove('status-changed'), 2000);
+}
+
+/* ── Show bottom toast ── */
+function showStatusToast(msg) {
+  const t = document.getElementById('statusToast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._tmr);
+  t._tmr = setTimeout(() => t.classList.remove('show'), 3500);
+}
+
+/* ── Render a single order card ──
+   Added id="statusBadge-X", id="payBadge-X", id="paidAt-X", id="orderCard-X"
+   so pollStatuses() can find and update them in the DOM.
+── */
 function renderOrder(o) {
-  const statusClass = {
-    pending:   'badge-pending',
-    preparing: 'badge-preparing',
-    served:    'badge-served',
-    cancelled: 'badge-cancelled'
-  }[o.status] || 'badge-pending';
-
-  const statusIcon = {
-    pending:   '⏳',
-    preparing: '👨‍🍳',
-    served:    '✅',
-    cancelled: '❌'
-  }[o.status] || '⏳';
-
-  const payClass = o.payment_status === 'paid' ? 'badge-paid' : 'badge-unpaid';
-  const payIcon  = o.payment_status === 'paid' ? '✅' : '⏳';
-  const payLabel = o.payment_status === 'paid' ? 'Paid'       : 'Unpaid';
+  const statusInfo = STATUS_INFO[o.status] || STATUS_INFO.pending;
+  const isPaid  = o.payment_status === 'paid';
 
   const paidAt = o.paid_at
-    ? `<span class="paid-at">Paid at ${formatDate(o.paid_at)}</span>`
-    : '';
+    ? `<span class="paid-at" id="paidAt-${o.id}">Paid at ${formatDate(o.paid_at)}</span>`
+    : `<span class="paid-at" id="paidAt-${o.id}"></span>`;
 
   const tableChip = o.table_number
     ? `<span class="table-chip">🪑 Table ${o.table_number}</span>`
@@ -339,7 +509,7 @@ function renderOrder(o) {
     </div>`).join('');
 
   return `
-    <div class="order-card">
+    <div class="order-card" id="orderCard-${o.id}">
       <div class="card-head">
         <div class="card-head-left">
           <span class="order-num">Order #${o.id}</span>
@@ -357,10 +527,10 @@ function renderOrder(o) {
           </div>
           <div style="text-align:right">
             <div style="margin-bottom:6px">
-              <span class="badge ${statusClass}">${statusIcon} ${o.status}</span>
+              <span class="badge ${statusInfo.cls}" id="statusBadge-${o.id}">${statusInfo.icon} ${o.status}</span>
             </div>
             <div class="payment-row" style="justify-content:flex-end">
-              <span class="badge ${payClass}">${payIcon} ${payLabel}</span>
+              <span class="badge ${isPaid ? 'badge-paid' : 'badge-unpaid'}" id="payBadge-${o.id}">${isPaid ? '✅ Paid' : '⏳ Unpaid'}</span>
             </div>
             ${paidAt}
           </div>
@@ -369,6 +539,7 @@ function renderOrder(o) {
     </div>`;
 }
 
+/* ── Helpers ── */
 function formatDate(str) {
   if (!str) return '—';
   const d = new Date(str);
@@ -380,6 +551,10 @@ function formatDate(str) {
 function escHtml(s) {
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
+
+// Stop polling when user leaves the page
+window.addEventListener('pagehide', stopPolling);
+window.addEventListener('beforeunload', stopPolling);
 </script>
 
 </body>
