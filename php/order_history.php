@@ -56,13 +56,15 @@ while ($row = mysqli_fetch_assoc($result)) {
     // Get order items
     $orderId = $row['id'];
 
-    $itemSql = "
+   $itemSql = "
 SELECT 
-    name,
-    price,
-    quantity
-FROM order_items
-WHERE order_id = '$orderId'
+    m.name,
+    oi.price,
+    oi.quantity
+FROM order_items oi
+JOIN menu_items m 
+ON oi.menu_item_id = m.id
+WHERE oi.order_id = '$orderId'
 ";
 
     $itemResult = mysqli_query($conn, $itemSql);
