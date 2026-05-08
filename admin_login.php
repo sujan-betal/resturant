@@ -65,6 +65,17 @@ body {
   text-decoration: none;
 }
 .back-link:hover { color: #C8460A; }
+
+/* ── Responsive ── */
+@media (max-width: 480px) {
+  body { padding: 1rem; }
+  .login-box { padding: 2rem 1.4rem; border-radius: 16px; }
+  .login-title { font-size: 1.5rem; }
+  .login-logo { font-size: 2rem; }
+  .login-sub { font-size: 0.85rem; margin-bottom: 1.5rem; }
+  .form-group input { font-size: 1rem; padding: 0.9rem 1rem; }
+  .login-btn { font-size: 0.95rem; }
+}
 </style>
 </head>
 <body>

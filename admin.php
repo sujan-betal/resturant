@@ -67,6 +67,71 @@ tr.row-unpaid { background: #FFFEF6 !important; }
 }
 .admin-toast.show { opacity: 1; transform: translateY(0); }
 
+/* ── Mobile sidebar toggle button ── */
+.sidebar-toggle {
+  display: none;
+  position: fixed;
+  top: 1rem; left: 1rem;
+  z-index: 1100;
+  background: #1A0F0A;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  width: 42px; height: 42px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  align-items: center; justify-content: center;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+  transition: background 0.2s;
+}
+.sidebar-toggle:hover { background: #3D1A0A; }
+.sidebar-overlay {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.55);
+  z-index: 999;
+}
+.sidebar-overlay.open { display: block; }
+
+/* ── Responsive ── */
+@media (max-width: 900px) {
+  .admin-layout { grid-template-columns: 1fr; }
+  .sidebar {
+    position: fixed;
+    top: 0; left: 0;
+    height: 100vh;
+    transform: translateX(-100%);
+    transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+    z-index: 1000;
+    box-shadow: 6px 0 30px rgba(0,0,0,0.3);
+  }
+  .sidebar.open { transform: translateX(0); }
+  .admin-main { padding: 1rem 0.8rem; padding-top: 4rem; }
+  .admin-header { margin-bottom: 1rem; gap: 0.5rem; }
+  .admin-header h1 { font-size: 1.3rem; }
+  .sidebar-toggle { display: flex; }
+  .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 0.7rem; }
+  .stat-card { padding: 0.9rem 1rem; }
+  .stat-card .stat-icon { font-size: 1.4rem; }
+  .stat-info span { font-size: 1.4rem; }
+}
+
+@media (max-width: 600px) {
+  .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 0.6rem; }
+  .stat-card { padding: 0.75rem; }
+  .table-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: 12px; }
+  .admin-table { min-width: 720px; font-size: 0.8rem; }
+  .admin-table th, .admin-table td { padding: 0.6rem 0.7rem; }
+  .badge-paid, .badge-unpaid { font-size: 0.7rem; padding: 2px 8px; }
+  .btn-mark-paid { font-size: 0.7rem; padding: 4px 10px; }
+  .refresh-btn { padding: 0.5rem 0.9rem; font-size: 0.8rem; }
+  .admin-header { padding: 0.75rem 1rem; }
+  .logout-modal { padding: 2rem 1.4rem; }
+  .logout-modal h3 { font-size: 1.2rem; }
+  .lm-btn { font-size: 0.85rem; padding: 0.65rem 0.8rem; }
+  .admin-toast { bottom: 1rem; right: 1rem; left: 1rem; font-size: 0.85rem; text-align: center; }
+}
+
 /* ── Logout Confirmation Modal ── */
 .logout-modal-overlay {
   position: fixed; inset: 0;
@@ -127,6 +192,10 @@ tr.row-unpaid { background: #FFFEF6 !important; }
 </style>
 </head>
 <body>
+
+<!-- Mobile sidebar toggle -->
+<button class="sidebar-toggle" id="sidebarToggle" onclick="toggleSidebar()">☰</button>
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
 
 <div class="admin-layout">
   <!-- SIDEBAR -->
@@ -352,10 +421,29 @@ function confirmLogout() {
 document.getElementById('logoutModal').addEventListener('click', function(e) {
   if (e.target === this) closeLogoutConfirm();
 });
-
 // Close on Escape key
 document.addEventListener('keydown', function(e) {
   if (e.key === 'Escape') closeLogoutConfirm();
+});
+
+/* ════════════════════════════════════════════════════════
+   MOBILE SIDEBAR TOGGLE
+════════════════════════════════════════════════════════ */
+function toggleSidebar() {
+  const sidebar = document.querySelector('.sidebar');
+  const overlay = document.getElementById('sidebarOverlay');
+  sidebar.classList.toggle('open');
+  overlay.classList.toggle('open');
+}
+function closeSidebar() {
+  document.querySelector('.sidebar').classList.remove('open');
+  document.getElementById('sidebarOverlay').classList.remove('open');
+}
+// Close sidebar when a nav item is clicked on mobile
+document.querySelectorAll('.sidebar-nav .nav-item').forEach(function(el) {
+  el.addEventListener('click', function() {
+    if (window.innerWidth <= 900) closeSidebar();
+  });
 });
 </script>
 

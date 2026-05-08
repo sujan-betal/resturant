@@ -272,6 +272,34 @@ body {
 .status-toast.show {
   opacity: 1; transform: translateX(-50%) translateY(0);
 }
+
+/* ── Responsive ── */
+@media (max-width: 640px) {
+  .navbar { padding: 0.85rem 1.1rem; }
+  .nav-brand { font-size: 1.1rem; }
+  .nav-back { font-size: 0.8rem; }
+  .hero-strip { padding: 2.2rem 1.2rem; }
+  .hero-strip h1 { font-size: 1.7rem; }
+  .hero-strip p { font-size: 0.85rem; }
+  .search-wrap { margin: -1.2rem auto 1.5rem; padding: 0 0.8rem; }
+  .search-card { padding: 1.3rem 1.1rem; border-radius: 16px; }
+  .search-row { flex-direction: column; gap: 0.5rem; }
+  .search-row input { width: 100%; }
+  .search-btn { width: 100%; text-align: center; }
+  .results { padding: 0 0.8rem 2rem; }
+  .card-head { padding: 0.9rem 1rem; }
+  .card-head-left { flex-wrap: wrap; gap: 0.4rem; }
+  .card-body-inner { padding: 0.9rem 1rem; }
+  .card-footer-row { flex-direction: column; align-items: flex-start; gap: 0.8rem; }
+  .card-footer-row > div:last-child { width: 100%; text-align: left !important; }
+  .payment-row { justify-content: flex-start !important; }
+  .total-amount { font-size: 1.1rem; }
+  .order-num { font-size: 0.9rem; }
+  .item-row { font-size: 0.82rem; }
+  .status-toast { white-space: normal; text-align: center; width: 90%; left: 5%; transform: translateY(20px); border-radius: 12px; }
+  .status-toast.show { transform: translateY(0); }
+  .live-bar { flex-direction: column; align-items: flex-start; gap: 0.3rem; }
+}
 </style>
 </head>
 <body>

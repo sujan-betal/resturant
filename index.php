@@ -384,6 +384,618 @@
 }
 .copy-flash.show { opacity: 1; }
 
+/* ════════════════════════════════════════════════
+   GLOBAL BASE
+   ════════════════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; }
+html { overflow-x: hidden; }
+body { overflow-x: hidden; max-width: 100vw; }
+
+/* ── Hamburger (hidden on desktop) ── */
+.nav-hamburger {
+  display: none;
+  background: var(--primary, #C8460A);
+  border: none;
+  color: #fff;
+  font-size: 1.3rem;
+  cursor: pointer;
+  padding: 0.4rem 0.65rem;
+  border-radius: 8px;
+  line-height: 1;
+  flex-shrink: 0;
+  transition: opacity 0.2s;
+}
+.nav-hamburger:hover { opacity: 0.85; }
+
+/* ── Mobile nav overlay ── */
+.nav-mobile-overlay {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: 1998;
+  backdrop-filter: blur(2px);
+}
+.nav-mobile-overlay.open { display: block; }
+
+/* ════════════════════════════════════════════════
+   TABLET  ≤ 1024px  — shrink padding, reduce sizes
+   ════════════════════════════════════════════════ */
+@media (max-width: 1024px) {
+  nav.navbar { padding: 1rem 2rem !important; }
+  .hero       { padding: 7rem 3rem 4rem !important; gap: 3rem !important; }
+  .hero-img-circle { width: 340px !important; height: 340px !important; }
+  .menu-section    { padding: 4rem 2rem !important; }
+  .about-section   { padding: 4rem 2rem !important; gap: 3rem !important; }
+}
+
+/* ════════════════════════════════════════════════
+   TABLET  ≤ 860px  — collapse 2-col grids to 1 col
+   ════════════════════════════════════════════════ */
+@media (max-width: 860px) {
+
+  /* ── Navbar ── */
+  nav.navbar { padding: 0.85rem 1.25rem !important; }
+
+  /* ── Hero: break the CSS Grid from style.css ── */
+  .hero, section.hero {
+    display:           flex !important;   /* override display:grid */
+    flex-direction:    column !important;
+    align-items:       center !important;
+    text-align:        center !important;
+    padding:           6rem 2rem 3rem !important;
+    min-height:        auto !important;
+    gap:               2rem !important;
+  }
+  .hero-content {
+    order:          1 !important;
+    display:        flex !important;
+    flex-direction: column !important;
+    align-items:    center !important;
+    width:          100% !important;
+    max-width:      520px !important;
+  }
+  .hero-image {
+    order:      2 !important;
+    width:      100% !important;
+    max-width:  300px !important;
+    margin:     0 auto !important;
+    position:   relative !important;
+    display:    flex !important;
+    justify-content: center !important;
+  }
+  .hero h1        { font-size: clamp(2rem, 5vw, 2.8rem) !important; }
+  .hero-sub       { max-width: 420px !important; }
+  .hero-img-circle { width: 260px !important; height: 260px !important; }
+  .floating-badge {
+    font-size: 0.72rem !important;
+    padding:   0.3rem 0.8rem !important;
+    white-space: nowrap !important;
+  }
+  .badge1 { bottom: 30px !important; left: -15px !important; }
+  .badge2 { top: 20px !important;    right: -15px !important; }
+
+  /* ── About: break the CSS Grid from style.css ── */
+  .about-section, section#about, section.about-section {
+    display:        flex !important;   /* override display:grid */
+    flex-direction: column !important;
+    padding:        3.5rem 2rem !important;
+    gap:            2rem !important;
+  }
+  .about-img {
+    width:     100% !important;
+    max-width: 500px !important;
+    margin:    0 auto !important;
+  }
+
+  /* ── Menu: 2-col grid ── */
+  .menu-section { padding: 3.5rem 2rem !important; }
+  .menu-grid    { grid-template-columns: repeat(2, 1fr) !important; }
+}
+
+/* ── Overlay behind drawer ── */
+.nav-mobile-overlay {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.65);
+  z-index: 1998;
+  backdrop-filter: blur(2px);
+}
+.nav-mobile-overlay.open { display: block; }
+
+/* ════════════════════════════════════════════════
+   MOBILE  ≤ 768px  (base — applies to all ≤768px)
+   ════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+
+  /* ── Navbar ── */
+  nav.navbar {
+    padding:         0.75rem 1rem !important;
+    position:        sticky !important;
+    top:             0 !important;
+    z-index:         2000 !important;
+    display:         flex !important;
+    justify-content: space-between !important;
+    align-items:     center !important;
+  }
+  .nav-brand        { font-size: 1.1rem !important; }
+  .nav-hamburger    { display: flex !important; align-items: center !important; }
+
+  /* Side-drawer */
+  .nav-links, div.nav-links {
+    display:         flex !important;
+    position:        fixed !important;
+    top: 0 !important; right: 0 !important; bottom: 0 !important;
+    left:            auto !important;
+    width:           75vw !important;
+    max-width:       270px !important;
+    height:          100dvh !important;
+    background:      #1A0F0A !important;
+    flex-direction:  column !important;
+    align-items:     flex-start !important;
+    justify-content: flex-start !important;
+    gap:             0 !important;
+    padding:         5rem 1.4rem 2rem !important;
+    z-index:         1999 !important;
+    overflow-y:      auto !important;
+    transform:       translateX(110%) !important;
+    transition:      transform 0.32s cubic-bezier(0.4,0,0.2,1), box-shadow 0.32s !important;
+    box-shadow:      none !important;
+  }
+  .nav-links.open, div.nav-links.open {
+    transform:  translateX(0) !important;
+    box-shadow: -12px 0 50px rgba(0,0,0,0.5) !important;
+  }
+  .nav-links a, div.nav-links a {
+    display:         block !important;
+    width:           100% !important;
+    padding:         0.9rem 0 !important;
+    border-bottom:   1px solid rgba(255,255,255,0.09) !important;
+    font-size:       1rem !important;
+    font-weight:     500 !important;
+    color:           #EDD8C8 !important;
+    text-decoration: none !important;
+    background:      transparent !important;
+    border-radius:   0 !important;
+  }
+  .nav-links a:hover, div.nav-links a:hover { color: #fff !important; }
+  .nav-links .cart-btn, div.nav-links .cart-btn {
+    display:         flex !important;
+    width:           100% !important;
+    margin-top:      1.2rem !important;
+    padding:         0.85rem 1rem !important;
+    border-radius:   10px !important;
+    justify-content: flex-start !important;
+    gap:             0.5rem !important;
+  }
+
+  /* ── Hero (base mobile) ── */
+  .hero, section.hero {
+    display:        flex !important;
+    flex-direction: column !important;
+    align-items:    center !important;
+    text-align:     center !important;
+    padding:        5rem 1.2rem 2.5rem !important;
+    min-height:     auto !important;
+    gap:            1.5rem !important;
+  }
+  .hero-content {
+    order:          1 !important;
+    display:        flex !important;
+    flex-direction: column !important;
+    align-items:    center !important;
+    width:          100% !important;
+    max-width:      100% !important;
+  }
+  .hero-image {
+    order:           2 !important;
+    width:           100% !important;
+    max-width:       220px !important;
+    margin:          0 auto !important;
+    display:         flex !important;
+    justify-content: center !important;
+    position:        relative !important;
+  }
+  .hero h1         { font-size: clamp(1.7rem, 5.5vw, 2.2rem) !important; line-height: 1.2 !important; }
+  .hero-tag        { font-size: 0.68rem !important; }
+  .hero-sub        { font-size: 0.88rem !important; max-width: 340px !important; margin: 0 auto 1.2rem !important; }
+  .btn-primary     { padding: 0.7rem 1.6rem !important; font-size: 0.9rem !important; }
+  .hero-img-circle { width: 185px !important; height: 185px !important; }
+  .floating-badge  {
+    font-size:     0.68rem !important;
+    padding:       0.28rem 0.7rem !important;
+    white-space:   nowrap !important;
+    border-radius: 30px !important;
+  }
+  .badge1 { bottom: 10px !important; left: -8px !important; }
+  .badge2 { top: 10px !important;    right: -8px !important; }
+
+  /* ── Menu (base mobile — single column list) ── */
+  .menu-section       { padding: 2.5rem 1rem !important; }
+  .section-header     { margin-bottom: 1rem !important; }
+  .section-header h2  { font-size: 1.5rem !important; }
+  .section-tag        { font-size: 0.7rem !important; }
+
+  .category-tabs {
+    display:          flex !important;
+    flex-wrap:        nowrap !important;
+    overflow-x:       auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    scrollbar-width:  none !important;
+    gap:              0.4rem !important;
+    padding:          0 0 0.6rem 0 !important;
+    justify-content:  flex-start !important;
+    margin-bottom:    1.2rem !important;
+  }
+  .category-tabs::-webkit-scrollbar { display: none !important; }
+  .tab {
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
+    padding:     0.4rem 1rem !important;
+    font-size:   0.82rem !important;
+  }
+
+  /* ── Menu card: horizontal row layout ── */
+  .menu-grid {
+    display:        flex !important;
+    flex-direction: column !important;
+    gap:            0.75rem !important;
+  }
+  .menu-card {
+    display:               grid !important;
+    grid-template-columns: 95px 1fr !important;
+    border-radius:         14px !important;
+    overflow:              hidden !important;
+    min-height:            95px !important;
+    width:                 100% !important;
+  }
+  .menu-card img, .card-img {
+    width:         95px !important;
+    height:        100% !important;
+    min-height:    95px !important;
+    object-fit:    cover !important;
+    border-radius: 0 !important;
+  }
+  .card-body {
+    padding:         0.65rem 0.9rem !important;
+    display:         flex !important;
+    flex-direction:  column !important;
+    justify-content: space-between !important;
+  }
+  .card-name  { font-size: 0.9rem !important; }
+  .card-desc  {
+    font-size:              0.73rem !important;
+    display:                -webkit-box !important;
+    -webkit-line-clamp:     2 !important;
+    -webkit-box-orient:     vertical !important;
+    overflow:               hidden !important;
+  }
+  .card-price { font-size: 0.95rem !important; }
+  .add-btn, .btn-add {
+    padding:       0.3rem 0.75rem !important;
+    font-size:     0.75rem !important;
+    border-radius: 20px !important;
+  }
+
+  /* ── About: stack column ── */
+  .about-section, section.about-section, section#about {
+    display:        flex !important;
+    flex-direction: column !important;
+    padding:        2.5rem 1rem !important;
+    gap:            1.5rem !important;
+  }
+  .about-content       { max-width: 100% !important; }
+  .about-content h2    { font-size: 1.5rem !important; }
+  .about-content p     { font-size: 0.88rem !important; }
+  .about-img           { width: 100% !important; }
+  .about-img img       {
+    border-radius: 14px !important;
+    max-height:    220px !important;
+    object-fit:    cover !important;
+    width:         100% !important;
+  }
+  .about-stats {
+    display:               grid !important;
+    grid-template-columns: repeat(3,1fr) !important;
+    gap:                   0.5rem !important;
+  }
+  .stat span { font-size: 1.3rem !important; }
+  .stat p    { font-size: 0.7rem !important; }
+
+  /* ── Cart sidebar ── */
+  .cart-sidebar { width: 100% !important; border-radius: 0 !important; }
+
+  /* ── Order modal — bottom sheet ── */
+  .modal-overlay { align-items: flex-end !important; padding: 0 !important; }
+  .modal {
+    border-radius: 22px 22px 0 0 !important;
+    max-height:    90vh !important;
+    overflow-y:    auto !important;
+    padding:       1.4rem 1.1rem 2.5rem !important;
+    width:         100% !important;
+    max-width:     100% !important;
+  }
+
+  /* ── Payment modal — bottom sheet ── */
+  .payment-modal-overlay { align-items: flex-end !important; padding: 0 !important; }
+  .payment-modal {
+    border-radius: 22px 22px 0 0 !important;
+    max-width:     100% !important;
+    width:         100% !important;
+    max-height:    92vh !important;
+    transform:     translateY(30px) !important;
+  }
+  .payment-modal-overlay.open .payment-modal { transform: translateY(0) !important; }
+  .pm-header         { padding: 1.2rem 1.1rem 0.9rem !important; }
+  .pm-header h2      { font-size: 1.2rem !important; }
+  .pm-amount-badge   { font-size: 1.2rem !important; padding: 0.28rem 0.9rem !important; margin-top: 0.6rem !important; }
+  .pm-panel          { padding: 1rem !important; }
+  .pm-tab            { font-size: 0.68rem !important; padding: 0.65rem 0.2rem !important; }
+  .pm-tab .tab-icon  { font-size: 1rem !important; }
+  .upi-grid          { grid-template-columns: repeat(3,1fr) !important; gap: 0.4rem !important; }
+  .upi-app-btn       { padding: 0.6rem 0.2rem !important; border-radius: 10px !important; }
+  .upi-app-btn .app-logo-emoji { width: 34px !important; height: 34px !important; font-size: 1.3rem !important; }
+  .upi-app-btn .app-name { font-size: 0.6rem !important; }
+  .upi-manual-row    { flex-direction: column !important; gap: 0.5rem !important; }
+  .upi-pay-btn       { width: 100% !important; }
+  #qrContainer       { width: 155px !important; height: 155px !important; }
+  .card-preview      { min-height: 100px !important; padding: 0.9rem 1rem !important; }
+  .card-number-display { font-size: 0.86rem !important; letter-spacing: 1px !important; }
+  .card-type-icons   { flex-wrap: wrap !important; gap: 0.25rem !important; }
+  .cf-row            { flex-direction: column !important; gap: 0.55rem !important; }
+  .card-submit-btn   { font-size: 0.9rem !important; padding: 0.85rem !important; }
+
+  /* ── Order tracker ── */
+  .order-tracker {
+    bottom: 0 !important; left: 0 !important; right: 0 !important;
+    width: 100% !important; border-radius: 20px 20px 0 0 !important;
+    transform: translateY(110%) scale(1) !important;
+  }
+  .order-tracker.visible { transform: translateY(0) scale(1) !important; }
+  .ot-step-icon  { width: 34px !important; height: 34px !important; font-size: 0.9rem !important; }
+  .ot-step-label { font-size: 0.58rem !important; }
+  .ot-body       { padding: 0.9rem 1rem 0.8rem !important; }
+
+  /* ── Footer ── */
+  footer.footer, .footer {
+    padding:    1.4rem 1rem !important;
+    font-size:  0.8rem !important;
+    text-align: center !important;
+  }
+}
+
+/* ════════════════════════════════════════════════
+   MID-RANGE  480px – 768px  (larger phones / small tablets)
+   Two-column menu grid, bigger hero image, wider hero text
+   ════════════════════════════════════════════════ */
+@media (min-width: 480px) and (max-width: 768px) {
+
+  /* ── Navbar — slightly more breathing room ── */
+  nav.navbar {
+    padding: 0.8rem 1.25rem !important;
+  }
+  .nav-brand { font-size: 1.2rem !important; }
+
+  /* ── Hero — scale up a notch ── */
+  .hero, section.hero {
+    padding:    5.5rem 1.8rem 3rem !important;
+    gap:        2rem !important;
+  }
+  .hero h1 { font-size: clamp(2rem, 5.5vw, 2.5rem) !important; }
+  .hero-sub {
+    font-size: 0.92rem !important;
+    max-width: 420px !important;
+  }
+  .hero-image { max-width: 260px !important; }
+  .hero-img-circle { width: 230px !important; height: 230px !important; }
+  .badge1 { bottom: 18px !important; left: -14px !important; }
+  .badge2 { top: 18px !important;    right: -14px !important; }
+  .floating-badge {
+    font-size: 0.72rem !important;
+    padding:   0.32rem 0.85rem !important;
+  }
+
+  /* ── Menu — 2-column card grid ── */
+  .menu-section  { padding: 3rem 1.5rem !important; }
+  .section-header h2 { font-size: 1.7rem !important; }
+
+  .menu-grid {
+    display:               grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap:                   1rem !important;
+    flex-direction:        unset !important;
+  }
+  /* Revert to vertical card layout inside 2-col grid */
+  .menu-card {
+    display:               flex !important;
+    flex-direction:        column !important;
+    grid-template-columns: unset !important;
+    min-height:            unset !important;
+    border-radius:         16px !important;
+  }
+  .menu-card img, .card-img {
+    width:         100% !important;
+    height:        140px !important;
+    min-height:    unset !important;
+    object-fit:    cover !important;
+    border-radius: 0 !important;
+  }
+  .card-body {
+    padding:        0.75rem 0.9rem !important;
+    flex-direction: column !important;
+    gap:            0.4rem !important;
+  }
+  .card-name  { font-size: 0.92rem !important; }
+  .card-desc  {
+    font-size:          0.75rem !important;
+    -webkit-line-clamp: 2 !important;
+  }
+  .card-price { font-size: 0.98rem !important; }
+  .add-btn, .btn-add {
+    padding:       0.35rem 0.9rem !important;
+    font-size:     0.78rem !important;
+    align-self:    flex-start !important;
+  }
+
+  /* ── About — scale nicely ── */
+  .about-section, section.about-section, section#about {
+    padding: 3rem 1.5rem !important;
+    gap:     2rem !important;
+  }
+  .about-content h2 { font-size: 1.7rem !important; }
+  .about-content p  { font-size: 0.92rem !important; }
+  .about-img img    { max-height: 280px !important; }
+  .about-stats {
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap:                   0.8rem !important;
+  }
+  .stat span { font-size: 1.5rem !important; }
+  .stat p    { font-size: 0.75rem !important; }
+
+  /* ── Cart sidebar — partial overlay, not full width ── */
+  .cart-sidebar {
+    width:         320px !important;
+    border-radius: 20px 0 0 20px !important;
+  }
+
+  /* ── Order / Payment modal — centred card, not bottom sheet ── */
+  .modal-overlay      { align-items: center !important; padding: 1rem !important; }
+  .modal {
+    border-radius: 20px !important;
+    max-width:     480px !important;
+    width:         94% !important;
+    max-height:    88vh !important;
+    padding:       1.6rem 1.4rem 2rem !important;
+  }
+  .payment-modal-overlay {
+    align-items: center !important;
+    padding:     1rem !important;
+  }
+  .payment-modal {
+    border-radius: 20px !important;
+    max-width:     440px !important;
+    width:         94% !important;
+    max-height:    90vh !important;
+    transform:     translateY(24px) scale(0.97) !important;
+  }
+  .payment-modal-overlay.open .payment-modal {
+    transform: translateY(0) scale(1) !important;
+  }
+  .pm-header     { padding: 1.4rem 1.6rem 1rem !important; }
+  .pm-header h2  { font-size: 1.35rem !important; }
+  .pm-amount-badge {
+    font-size:   1.35rem !important;
+    padding:     0.32rem 1rem !important;
+    margin-top:  0.7rem !important;
+  }
+  .pm-panel { padding: 1.2rem 1.4rem !important; }
+  .pm-tab   { font-size: 0.75rem !important; padding: 0.75rem 0.4rem !important; }
+  .pm-tab .tab-icon { font-size: 1.1rem !important; }
+
+  .upi-grid { grid-template-columns: repeat(3,1fr) !important; gap: 0.6rem !important; }
+  .upi-app-btn { padding: 0.75rem 0.4rem !important; }
+  .upi-app-btn .app-logo-emoji {
+    width: 40px !important; height: 40px !important; font-size: 1.5rem !important;
+  }
+  .upi-app-btn .app-name { font-size: 0.65rem !important; }
+  .upi-manual-row { flex-direction: row !important; }
+  .upi-pay-btn    { width: auto !important; }
+
+  #qrContainer    { width: 175px !important; height: 175px !important; }
+
+  .card-preview   { min-height: 115px !important; padding: 1.1rem 1.2rem !important; }
+  .card-number-display { font-size: 0.95rem !important; letter-spacing: 2px !important; }
+  .cf-row         { flex-direction: row !important; gap: 0.7rem !important; }
+
+  /* ── Order tracker — bottom sheet still, but better sizing ── */
+  .order-tracker {
+    bottom: 0 !important; left: 0 !important; right: 0 !important;
+    width: 100% !important; border-radius: 20px 20px 0 0 !important;
+  }
+  .ot-step-icon  { width: 36px !important; height: 36px !important; }
+  .ot-step-label { font-size: 0.62rem !important; }
+  .ot-body       { padding: 1rem 1.2rem !important; }
+
+  /* ── Footer ── */
+  footer.footer, .footer {
+    padding:   1.6rem 1.5rem !important;
+    font-size: 0.82rem !important;
+  }
+}
+
+/* ════════════════════════════════════════════════
+   COMPACT PHONES  400px – 479px
+   Single-column list cards, tight hero, optimised modals
+   ════════════════════════════════════════════════ */
+@media (min-width: 400px) and (max-width: 479px) {
+
+  /* ── Hero ── */
+  .hero, section.hero { padding: 5rem 1.3rem 2.5rem !important; gap: 1.8rem !important; }
+  .hero h1             { font-size: 1.85rem !important; }
+  .hero-sub            { max-width: 320px !important; font-size: 0.9rem !important; }
+  .hero-image          { max-width: 200px !important; }
+  .hero-img-circle     { width: 170px !important; height: 170px !important; }
+
+  /* ── Menu card — slightly wider image column ── */
+  .menu-card {
+    grid-template-columns: 100px 1fr !important;
+    min-height:            100px !important;
+  }
+  .menu-card img, .card-img {
+    width:      100px !important;
+    min-height: 100px !important;
+  }
+  .card-body  { padding: 0.7rem 0.85rem !important; }
+  .card-name  { font-size: 0.92rem !important; }
+  .card-price { font-size: 0.95rem !important; }
+
+  /* ── Payment modal — bottom sheet ── */
+  .payment-modal-overlay { align-items: flex-end !important; padding: 0 !important; }
+  .payment-modal {
+    border-radius: 22px 22px 0 0 !important;
+    max-width: 100% !important; width: 100% !important;
+    max-height: 92vh !important;
+    transform: translateY(30px) !important;
+  }
+  .payment-modal-overlay.open .payment-modal { transform: translateY(0) !important; }
+  .upi-manual-row { flex-direction: column !important; }
+  .upi-pay-btn    { width: 100% !important; }
+  .cf-row         { flex-direction: column !important; gap: 0.55rem !important; }
+
+  /* ── Cart sidebar — full width ── */
+  .cart-sidebar   { width: 100% !important; border-radius: 0 !important; }
+
+  /* ── About stats ── */
+  .about-stats {
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 0.5rem !important;
+  }
+  .stat span { font-size: 1.2rem !important; }
+  .stat p    { font-size: 0.7rem !important; }
+}
+
+/* ════════════════════════════════════════════════
+   SMALL PHONES  ≤ 399px
+   ════════════════════════════════════════════════ */
+@media (max-width: 399px) {
+  .hero h1, section.hero h1 { font-size: 1.65rem !important; }
+  .hero-sub                  { max-width: 260px !important; }
+  .hero-img-circle           { width: 155px !important; height: 155px !important; }
+  .floating-badge            { display: none !important; }
+  .menu-card {
+    grid-template-columns: 80px 1fr !important;
+    min-height: 82px !important;
+  }
+  .menu-card img, .card-img  { width: 80px !important; min-height: 82px !important; }
+  .card-body  { padding: 0.5rem 0.7rem !important; }
+  .card-name  { font-size: 0.85rem !important; }
+  .about-stats { gap: 0.3rem !important; }
+  .stat span   { font-size: 1.1rem !important; }
+  .stat p      { font-size: 0.65rem !important; }
+  .pm-tab      { font-size: 0.62rem !important; padding: 0.55rem 0.15rem !important; }
+  .upi-grid    { gap: 0.3rem !important; }
+  .upi-app-btn .app-logo-emoji { width: 30px !important; height: 30px !important; font-size: 1.1rem !important; }
+}
+
 /* ══════════════════════════════════════════════
    SUCCESS OVERLAY POPUPS (unchanged)
    ══════════════════════════════════════════════ */
@@ -421,15 +1033,17 @@
 <!-- NAVBAR -->
 <nav class="navbar">
   <div class="nav-brand">🍽 Spice &amp; Soul</div>
-  <div class="nav-links">
+  <div class="nav-links" id="navLinks">
     <a href="#menu">Menu</a>
     <a href="history.php">📋 My Orders</a>
     <a href="#about">About</a>
-    <button class="cart-btn" onclick="toggleCart()">
+    <button class="cart-btn" onclick="toggleCart(); closeMobileNav()">
       🛒 Cart <span class="cart-count" id="cartCount">0</span>
     </button>
   </div>
+  <button class="nav-hamburger" id="navHamburger" onclick="toggleMobileNav()" aria-label="Toggle menu">☰</button>
 </nav>
+<div class="nav-mobile-overlay" id="navMobileOverlay" onclick="closeMobileNav()"></div>
 
 <!-- HERO -->
 <section class="hero">
@@ -927,6 +1541,8 @@
 </style>
 
 <div class="order-tracker" id="orderTracker">
+  <!-- drag handle for mobile -->
+  <div style="display:flex;justify-content:center;padding:8px 0 0;"><div style="width:36px;height:4px;border-radius:4px;background:rgba(255,255,255,0.25);"></div></div>
   <div class="ot-header">
     <div>
       <div class="ot-title">🍽 Order Status</div>
@@ -1614,6 +2230,27 @@ if (_origShowPaymentQR) {
     _origShowPaymentQR(orderId, totalAmount);
   };
 }
+</script>
+
+<script>
+// ── Mobile nav toggle ──
+function toggleMobileNav() {
+  var links   = document.getElementById('navLinks');
+  var overlay = document.getElementById('navMobileOverlay');
+  var burger  = document.getElementById('navHamburger');
+  var isOpen  = links.classList.toggle('open');
+  overlay.classList.toggle('open', isOpen);
+  burger.textContent = isOpen ? '✕' : '☰';
+}
+function closeMobileNav() {
+  document.getElementById('navLinks').classList.remove('open');
+  document.getElementById('navMobileOverlay').classList.remove('open');
+  document.getElementById('navHamburger').textContent = '☰';
+}
+// Close nav when a link is tapped
+document.querySelectorAll('.nav-links a').forEach(function(el) {
+  el.addEventListener('click', closeMobileNav);
+});
 </script>
 
 </body>
