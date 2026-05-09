@@ -1,88 +1,90 @@
 <?php
+/**
+ * php/order_history.php
+ * GET: phone (customer phone number)
+ * Returns all orders for that phone + cancel reason + refund info
+ */
 
 header('Content-Type: application/json');
+require_once 'connect.php';
 
-include 'connect.php';
-
-$phone = $_GET['phone'] ?? '';
-
+$phone = trim($_GET['phone'] ?? '');
 if (!$phone) {
-
-    echo json_encode([
-        "success" => false,
-        "orders" => [],
-        "message" => "Phone number required"
-    ]);
-
+    echo json_encode(['success'=>false,'error'=>'Phone required']);
     exit;
 }
 
-$phone = mysqli_real_escape_string($conn, $phone);
+try {
+    if (isset($pdo)) {
 
-$sql = "
-SELECT 
-    id,
-    customer_name,
-    customer_phone,
-    table_number,
-    total_amount,
-    status,
-    payment_status,
-    payment_method,
-    paid_at,
-    created_at
-FROM orders
-WHERE customer_phone = '$phone'
-ORDER BY id DESC
-";
+        // Fetch orders for this phone
+        $stmt = $pdo->prepare(
+            "SELECT o.id, o.customer_name, o.table_number, o.total_amount,
+                    o.status, o.created_at,
+                    COALESCE(p.payment_status,'unpaid') AS payment_status,
+                    p.paid_at,
+                    c.reason       AS cancel_reason,
+                    c.refund_needed,
+                    c.refund_amount
+             FROM orders o
+             LEFT JOIN payments            p ON p.order_id = o.id
+             LEFT JOIN order_cancellations c ON c.order_id = o.id
+             WHERE o.customer_phone = ?
+             ORDER BY o.created_at DESC
+             LIMIT 50"
+        );
+        $stmt->execute([$phone]);
+        $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-$result = mysqli_query($conn, $sql);
+        foreach ($orders as &$order) {
+            // Fetch items for each order
+            $iStmt = $pdo->prepare(
+                "SELECT m.name, oi.quantity, oi.price
+                 FROM order_items oi
+                 JOIN menu_items m ON m.id = oi.menu_item_id
+                 WHERE oi.order_id = ?"
+            );
+            $iStmt->execute([$order['id']]);
+            $order['items'] = $iStmt->fetchAll(PDO::FETCH_ASSOC);
+            $order['refund_amount'] = floatval($order['refund_amount'] ?? 0);
+        }
+        unset($order);
 
-if (!$result) {
-
-    echo json_encode([
-        "success" => false,
-        "orders" => [],
-        "message" => mysqli_error($conn)
-    ]);
-
-    exit;
-}
-
-$orders = [];
-
-while ($row = mysqli_fetch_assoc($result)) {
-
-    // Get order items
-    $orderId = $row['id'];
-
-   $itemSql = "
-SELECT 
-    m.name,
-    oi.price,
-    oi.quantity
-FROM order_items oi
-JOIN menu_items m 
-ON oi.menu_item_id = m.id
-WHERE oi.order_id = '$orderId'
-";
-
-    $itemResult = mysqli_query($conn, $itemSql);
-
-    $items = [];
-
-    while ($item = mysqli_fetch_assoc($itemResult)) {
-        $items[] = $item;
+    } else {
+        // mysqli fallback
+        $ph = $conn->real_escape_string($phone);
+        $res = $conn->query(
+            "SELECT o.id, o.customer_name, o.table_number, o.total_amount,
+                    o.status, o.created_at,
+                    COALESCE(p.payment_status,'unpaid') AS payment_status,
+                    p.paid_at,
+                    c.reason AS cancel_reason,
+                    c.refund_needed,
+                    c.refund_amount
+             FROM orders o
+             LEFT JOIN payments            p ON p.order_id = o.id
+             LEFT JOIN order_cancellations c ON c.order_id = o.id
+             WHERE o.customer_phone = '$ph'
+             ORDER BY o.created_at DESC
+             LIMIT 50"
+        );
+        $orders = [];
+        while ($row = $res->fetch_assoc()) {
+            $oid   = intval($row['id']);
+            $iRes  = $conn->query("SELECT m.name, oi.quantity, oi.price
+                                   FROM order_items oi
+                                   JOIN menu_items m ON m.id = oi.menu_item_id
+                                   WHERE oi.order_id = $oid");
+            $items = [];
+            while ($ir = $iRes->fetch_assoc()) $items[] = $ir;
+            $row['items']         = $items;
+            $row['refund_amount'] = floatval($row['refund_amount'] ?? 0);
+            $orders[]             = $row;
+        }
     }
 
-    $row['items'] = $items;
+    echo json_encode(['success' => true, 'orders' => $orders]);
 
-    $orders[] = $row;
+} catch (Exception $e) {
+    echo json_encode(['success'=>false,'error'=>$e->getMessage()]);
 }
-
-echo json_encode([
-    "success" => true,
-    "orders" => $orders
-]);
-
-?>

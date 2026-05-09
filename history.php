@@ -169,6 +169,12 @@ body {
   box-shadow: 0 0 0 3px rgba(40,167,69,0.15);
 }
 
+/* Cancelled card highlight */
+.order-card.card-cancelled {
+  border-color: #f5c6cb;
+  background: #fff8f8;
+}
+
 .card-head {
   padding: 1.1rem 1.4rem;
   display: flex; align-items: center; justify-content: space-between;
@@ -215,7 +221,7 @@ body {
   font-size: 0.88rem; padding: 0.25rem 0;
   color: #555;
 }
-.item-row .item-name { color: var(--brand-dk); }
+.item-row .item-name  { color: var(--brand-dk); }
 .item-row .item-price { font-weight: 600; }
 
 .divider { border: none; border-top: 1px dashed var(--border); margin: 0.8rem 0; }
@@ -224,7 +230,7 @@ body {
   display: flex; justify-content: space-between; align-items: center;
   flex-wrap: wrap; gap: 0.5rem;
 }
-.total-label { font-size: 0.85rem; color: var(--brand-md); }
+.total-label  { font-size: 0.85rem; color: var(--brand-md); }
 .total-amount { font-size: 1.3rem; font-weight: 700; color: var(--brand); }
 
 .payment-row {
@@ -242,6 +248,33 @@ body {
   border-radius: 8px; padding: 2px 10px;
   font-size: 0.78rem; color: var(--brand-md);
 }
+
+/* ── Cancellation reason box ── */
+.cancel-reason-box {
+  background: #FFF3CD;
+  border: 1px solid #FFE69C;
+  border-radius: 10px;
+  padding: 0.75rem 1rem;
+  margin-top: 0.9rem;
+  font-size: 0.83rem;
+  color: #856404;
+  line-height: 1.7;
+}
+.cancel-reason-box strong { color: #2C1810; }
+
+/* ── Refund info box ── */
+.refund-info-box {
+  background: #D4EDDA;
+  border: 1px solid #C3E6CB;
+  border-radius: 10px;
+  padding: 0.75rem 1rem;
+  margin-top: 0.6rem;
+  font-size: 0.83rem;
+  color: #155724;
+  line-height: 1.7;
+}
+.refund-info-box strong { color: #0d3d1c; }
+.refund-info-box a { color: #155724; font-weight: 700; }
 
 /* ── Spinner ── */
 .spinner {
@@ -299,6 +332,7 @@ body {
   .status-toast { white-space: normal; text-align: center; width: 90%; left: 5%; transform: translateY(20px); border-radius: 12px; }
   .status-toast.show { transform: translateY(0); }
   .live-bar { flex-direction: column; align-items: flex-start; gap: 0.3rem; }
+  .cancel-reason-box, .refund-info-box { font-size: 0.78rem; padding: 0.6rem 0.8rem; }
 }
 </style>
 </head>
@@ -351,9 +385,9 @@ body {
 //  LIVE STATUS POLLING — updates without page refresh
 // ══════════════════════════════════════════════════════
 
-let pollTimer   = null;    // interval handle
-let liveOrders  = [];      // latest known order data
-let currentPhone = '';     // phone used for last search
+let pollTimer    = null;
+let liveOrders   = [];
+let currentPhone = '';
 
 const STATUS_INFO = {
   pending   : { cls: 'badge-pending',   icon: '⏳', label: 'Pending'   },
@@ -362,13 +396,13 @@ const STATUS_INFO = {
   cancelled : { cls: 'badge-cancelled', icon: '❌', label: 'Cancelled' },
 };
 
-/* ── Search orders (called by button) ── */
+/* ── Search orders ── */
 async function searchOrders() {
-  const phone = document.getElementById('phoneInput').value.trim();
+  const phone   = document.getElementById('phoneInput').value.trim();
   const results = document.getElementById('results');
   if (!phone) { document.getElementById('phoneInput').focus(); return; }
 
-  stopPolling(); // stop any existing poll
+  stopPolling();
 
   results.innerHTML = `
     <div class="state-box">
@@ -380,7 +414,7 @@ async function searchOrders() {
     const res  = await fetch('php/order_history.php?phone=' + encodeURIComponent(phone));
     const data = await res.json();
 
-    if (!data.success || !data.orders.length) {
+    if (!data.success || !data.orders || !data.orders.length) {
       results.innerHTML = `
         <div class="state-box">
           <span class="state-icon">🔍</span>
@@ -394,7 +428,7 @@ async function searchOrders() {
     currentPhone = phone;
     liveOrders   = data.orders;
     renderAllOrders();
-    startPolling();                      // ← begin live updates
+    startPolling();
 
   } catch (err) {
     results.innerHTML = `
@@ -406,7 +440,7 @@ async function searchOrders() {
   }
 }
 
-/* ── Render all orders into the results div ── */
+/* ── Render all orders ── */
 function renderAllOrders() {
   const results = document.getElementById('results');
   results.innerHTML =
@@ -418,6 +452,90 @@ function renderAllOrders() {
        </div>
      </div>` +
     liveOrders.map(renderOrder).join('');
+}
+
+/* ── Render a single order card ── */
+function renderOrder(o) {
+  const statusInfo = STATUS_INFO[o.status] || STATUS_INFO.pending;
+  const isPaid     = o.payment_status === 'paid';
+
+  const paidAt = o.paid_at
+    ? `<span class="paid-at" id="paidAt-${o.id}">Paid at ${formatDate(o.paid_at)}</span>`
+    : `<span class="paid-at" id="paidAt-${o.id}"></span>`;
+
+  const tableChip = o.table_number
+    ? `<span class="table-chip">🪑 Table ${o.table_number}</span>`
+    : '';
+
+  const itemsHtml = o.items.map(i => `
+    <div class="item-row">
+      <span class="item-name">${escHtml(i.name)} × ${i.quantity}</span>
+      <span class="item-price">₹${(parseFloat(i.price) * parseInt(i.quantity)).toFixed(2)}</span>
+    </div>`).join('');
+
+  // ── Cancellation box (shown only when cancelled) ──
+  let cancelHtml = '';
+  if (o.status === 'cancelled') {
+    cancelHtml = `
+      <div class="cancel-reason-box" id="cancelBox-${o.id}">
+        ⚠️ <strong>Cancellation Reason:</strong>
+        ${escHtml(o.cancel_reason || 'No reason provided')}`;
+
+    if (isPaid && parseFloat(o.refund_amount || 0) > 0) {
+      cancelHtml += `
+        <div class="refund-info-box">
+          🔄 <strong>Refund ₹${parseFloat(o.refund_amount).toFixed(2)}</strong>
+          will be credited back to your original payment method within
+          <strong>5–7 business days</strong>.<br>
+          Didn't receive it? Call us:
+          <a href="tel:+919876543210">+91 98765 43210</a>
+        </div>`;
+    } else if (!isPaid) {
+      cancelHtml += `<br>
+        <span style="font-size:0.78rem;color:#8B6355;">
+          No payment was made — no refund required.
+        </span>`;
+    }
+
+    cancelHtml += `</div>`;
+  }
+
+  const cardClass = o.status === 'cancelled' ? 'order-card card-cancelled' : 'order-card';
+
+  return `
+    <div class="${cardClass}" id="orderCard-${o.id}">
+      <div class="card-head">
+        <div class="card-head-left">
+          <span class="order-num">Order #${o.id}</span>
+          ${tableChip}
+        </div>
+        <span class="order-date">${formatDate(o.created_at)}</span>
+      </div>
+      <div class="card-body-inner">
+        <div class="items-list">${itemsHtml}</div>
+        <hr class="divider">
+        <div class="card-footer-row">
+          <div>
+            <div class="total-label">Total Amount</div>
+            <div class="total-amount">₹${parseFloat(o.total_amount).toFixed(2)}</div>
+          </div>
+          <div style="text-align:right">
+            <div style="margin-bottom:6px">
+              <span class="badge ${statusInfo.cls}" id="statusBadge-${o.id}">
+                ${statusInfo.icon} ${statusInfo.label}
+              </span>
+            </div>
+            <div class="payment-row" style="justify-content:flex-end">
+              <span class="badge ${isPaid ? 'badge-paid' : 'badge-unpaid'}" id="payBadge-${o.id}">
+                ${isPaid ? '✅ Paid' : '⏳ Unpaid'}
+              </span>
+            </div>
+            ${paidAt}
+          </div>
+        </div>
+        ${cancelHtml}
+      </div>
+    </div>`;
 }
 
 /* ── Start polling every 5 seconds ── */
@@ -433,7 +551,7 @@ function stopPolling() {
   liveOrders   = [];
 }
 
-/* ── Poll: fetch latest statuses and diff ── */
+/* ── Poll: fetch latest statuses and update DOM ── */
 async function pollStatuses() {
   if (!currentPhone) return;
   try {
@@ -445,22 +563,61 @@ async function pollStatuses() {
       const old = liveOrders.find(o => o.id === fresh.id);
       if (!old) return;
 
-      let changed = false;
-
       // ── Order status changed? ──
       if (old.status !== fresh.status) {
-        old.status = fresh.status;
-        changed = true;
+        old.status        = fresh.status;
+        old.cancel_reason = fresh.cancel_reason;
+        old.refund_amount = fresh.refund_amount;
+        old.refund_needed = fresh.refund_needed;
+
         applyStatusBadge('statusBadge-' + fresh.id, fresh.status);
         flashCard(fresh.id);
-        showStatusToast('Order #' + fresh.id + ' is now ' + (STATUS_INFO[fresh.status]?.icon || '') + ' ' + (fresh.status.charAt(0).toUpperCase() + fresh.status.slice(1)));
+
+        // If cancelled → show reason + refund box
+        if (fresh.status === 'cancelled') {
+          // Add red tint to card
+          const card = document.getElementById('orderCard-' + fresh.id);
+          if (card) card.classList.add('card-cancelled');
+
+          // Create or update the cancel box
+          let box = document.getElementById('cancelBox-' + fresh.id);
+          if (!box) {
+            box = document.createElement('div');
+            box.id        = 'cancelBox-' + fresh.id;
+            box.className = 'cancel-reason-box';
+            const inner = document.querySelector('#orderCard-' + fresh.id + ' .card-body-inner');
+            if (inner) inner.appendChild(box);
+          }
+
+          let html = `⚠️ <strong>Cancellation Reason:</strong> ${escHtml(fresh.cancel_reason || 'No reason provided')}`;
+
+          if (old.payment_status === 'paid' && parseFloat(fresh.refund_amount || 0) > 0) {
+            html += `
+              <div class="refund-info-box">
+                🔄 <strong>Refund ₹${parseFloat(fresh.refund_amount).toFixed(2)}</strong>
+                will be credited to your original payment method within
+                <strong>5–7 business days</strong>.<br>
+                Didn't receive it? Call us:
+                <a href="tel:+919876543210">+91 98765 43210</a>
+              </div>`;
+          } else if (old.payment_status !== 'paid') {
+            html += `<br><span style="font-size:0.78rem;color:#8B6355;">No payment was made — no refund required.</span>`;
+          }
+
+          box.innerHTML = html;
+
+          showStatusToast('❌ Order #' + fresh.id + ' cancelled — ' + (fresh.cancel_reason || 'See details below'));
+
+        } else {
+          const info = STATUS_INFO[fresh.status];
+          showStatusToast('Order #' + fresh.id + ' is now ' + (info ? info.icon + ' ' + info.label : fresh.status));
+        }
       }
 
       // ── Payment status changed? ──
       if (old.payment_status !== fresh.payment_status) {
         old.payment_status = fresh.payment_status;
         old.paid_at        = fresh.paid_at;
-        changed = true;
         applyPaymentBadge('payBadge-' + fresh.id, fresh.payment_status);
         if (fresh.paid_at) {
           const el = document.getElementById('paidAt-' + fresh.id);
@@ -473,7 +630,7 @@ async function pollStatuses() {
     });
 
   } catch(e) {
-    // network hiccup — keep polling silently
+    // Network hiccup — keep polling silently
   }
 }
 
@@ -493,7 +650,7 @@ function applyPaymentBadge(id, payStatus) {
   if (!el) return;
   const isPaid = payStatus === 'paid';
   el.className = 'badge ' + (isPaid ? 'badge-paid' : 'badge-unpaid') + ' badge-updated';
-  el.innerHTML = (isPaid ? '✅ Paid' : '⏳ Unpaid');
+  el.innerHTML = isPaid ? '✅ Paid' : '⏳ Unpaid';
   setTimeout(() => el.classList.remove('badge-updated'), 600);
 }
 
@@ -511,60 +668,7 @@ function showStatusToast(msg) {
   t.textContent = msg;
   t.classList.add('show');
   clearTimeout(t._tmr);
-  t._tmr = setTimeout(() => t.classList.remove('show'), 3500);
-}
-
-/* ── Render a single order card ──
-   Added id="statusBadge-X", id="payBadge-X", id="paidAt-X", id="orderCard-X"
-   so pollStatuses() can find and update them in the DOM.
-── */
-function renderOrder(o) {
-  const statusInfo = STATUS_INFO[o.status] || STATUS_INFO.pending;
-  const isPaid  = o.payment_status === 'paid';
-
-  const paidAt = o.paid_at
-    ? `<span class="paid-at" id="paidAt-${o.id}">Paid at ${formatDate(o.paid_at)}</span>`
-    : `<span class="paid-at" id="paidAt-${o.id}"></span>`;
-
-  const tableChip = o.table_number
-    ? `<span class="table-chip">🪑 Table ${o.table_number}</span>`
-    : '';
-
-  const itemsHtml = o.items.map(i => `
-    <div class="item-row">
-      <span class="item-name">${escHtml(i.name)} × ${i.quantity}</span>
-      <span class="item-price">₹${(parseFloat(i.price) * parseInt(i.quantity)).toFixed(2)}</span>
-    </div>`).join('');
-
-  return `
-    <div class="order-card" id="orderCard-${o.id}">
-      <div class="card-head">
-        <div class="card-head-left">
-          <span class="order-num">Order #${o.id}</span>
-          ${tableChip}
-        </div>
-        <span class="order-date">${formatDate(o.created_at)}</span>
-      </div>
-      <div class="card-body-inner">
-        <div class="items-list">${itemsHtml}</div>
-        <hr class="divider">
-        <div class="card-footer-row">
-          <div>
-            <div class="total-label">Total Amount</div>
-            <div class="total-amount">₹${parseFloat(o.total_amount).toFixed(2)}</div>
-          </div>
-          <div style="text-align:right">
-            <div style="margin-bottom:6px">
-              <span class="badge ${statusInfo.cls}" id="statusBadge-${o.id}">${statusInfo.icon} ${o.status}</span>
-            </div>
-            <div class="payment-row" style="justify-content:flex-end">
-              <span class="badge ${isPaid ? 'badge-paid' : 'badge-unpaid'}" id="payBadge-${o.id}">${isPaid ? '✅ Paid' : '⏳ Unpaid'}</span>
-            </div>
-            ${paidAt}
-          </div>
-        </div>
-      </div>
-    </div>`;
+  t._tmr = setTimeout(() => t.classList.remove('show'), 4000);
 }
 
 /* ── Helpers ── */
@@ -577,7 +681,11 @@ function formatDate(str) {
 }
 
 function escHtml(s) {
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  return String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
 }
 
 // Stop polling when user leaves the page

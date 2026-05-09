@@ -418,7 +418,7 @@ body { overflow-x: hidden; max-width: 100vw; }
 .nav-mobile-overlay.open { display: block; }
 
 /* ════════════════════════════════════════════════
-   TABLET  ≤ 1024px  — shrink padding, reduce sizes
+   TABLET  ≤ 1024px
    ════════════════════════════════════════════════ */
 @media (max-width: 1024px) {
   nav.navbar { padding: 1rem 2rem !important; }
@@ -429,16 +429,12 @@ body { overflow-x: hidden; max-width: 100vw; }
 }
 
 /* ════════════════════════════════════════════════
-   TABLET  ≤ 860px  — collapse 2-col grids to 1 col
+   TABLET  ≤ 860px
    ════════════════════════════════════════════════ */
 @media (max-width: 860px) {
-
-  /* ── Navbar ── */
   nav.navbar { padding: 0.85rem 1.25rem !important; }
-
-  /* ── Hero: break the CSS Grid from style.css ── */
   .hero, section.hero {
-    display:           flex !important;   /* override display:grid */
+    display:           flex !important;
     flex-direction:    column !important;
     align-items:       center !important;
     text-align:        center !important;
@@ -473,10 +469,8 @@ body { overflow-x: hidden; max-width: 100vw; }
   }
   .badge1 { bottom: 30px !important; left: -15px !important; }
   .badge2 { top: 20px !important;    right: -15px !important; }
-
-  /* ── About: break the CSS Grid from style.css ── */
   .about-section, section#about, section.about-section {
-    display:        flex !important;   /* override display:grid */
+    display:        flex !important;
     flex-direction: column !important;
     padding:        3.5rem 2rem !important;
     gap:            2rem !important;
@@ -486,13 +480,10 @@ body { overflow-x: hidden; max-width: 100vw; }
     max-width: 500px !important;
     margin:    0 auto !important;
   }
-
-  /* ── Menu: 2-col grid ── */
   .menu-section { padding: 3.5rem 2rem !important; }
   .menu-grid    { grid-template-columns: repeat(2, 1fr) !important; }
 }
 
-/* ── Overlay behind drawer ── */
 .nav-mobile-overlay {
   display: none;
   position: fixed; inset: 0;
@@ -503,11 +494,9 @@ body { overflow-x: hidden; max-width: 100vw; }
 .nav-mobile-overlay.open { display: block; }
 
 /* ════════════════════════════════════════════════
-   MOBILE  ≤ 768px  (base — applies to all ≤768px)
+   MOBILE  ≤ 768px
    ════════════════════════════════════════════════ */
 @media (max-width: 768px) {
-
-  /* ── Navbar ── */
   nav.navbar {
     padding:         0.75rem 1rem !important;
     position:        sticky !important;
@@ -519,8 +508,6 @@ body { overflow-x: hidden; max-width: 100vw; }
   }
   .nav-brand        { font-size: 1.1rem !important; }
   .nav-hamburger    { display: flex !important; align-items: center !important; }
-
-  /* Side-drawer */
   .nav-links, div.nav-links {
     display:         flex !important;
     position:        fixed !important;
@@ -567,8 +554,6 @@ body { overflow-x: hidden; max-width: 100vw; }
     justify-content: flex-start !important;
     gap:             0.5rem !important;
   }
-
-  /* ── Hero (base mobile) ── */
   .hero, section.hero {
     display:        flex !important;
     flex-direction: column !important;
@@ -608,13 +593,10 @@ body { overflow-x: hidden; max-width: 100vw; }
   }
   .badge1 { bottom: 10px !important; left: -8px !important; }
   .badge2 { top: 10px !important;    right: -8px !important; }
-
-  /* ── Menu (base mobile — single column list) ── */
   .menu-section       { padding: 2.5rem 1rem !important; }
   .section-header     { margin-bottom: 1rem !important; }
   .section-header h2  { font-size: 1.5rem !important; }
   .section-tag        { font-size: 0.7rem !important; }
-
   .category-tabs {
     display:          flex !important;
     flex-wrap:        nowrap !important;
@@ -633,8 +615,6 @@ body { overflow-x: hidden; max-width: 100vw; }
     padding:     0.4rem 1rem !important;
     font-size:   0.82rem !important;
   }
-
-  /* ── Menu card: horizontal row layout ── */
   .menu-grid {
     display:        flex !important;
     flex-direction: column !important;
@@ -675,8 +655,6 @@ body { overflow-x: hidden; max-width: 100vw; }
     font-size:     0.75rem !important;
     border-radius: 20px !important;
   }
-
-  /* ── About: stack column ── */
   .about-section, section.about-section, section#about {
     display:        flex !important;
     flex-direction: column !important;
@@ -700,11 +678,7 @@ body { overflow-x: hidden; max-width: 100vw; }
   }
   .stat span { font-size: 1.3rem !important; }
   .stat p    { font-size: 0.7rem !important; }
-
-  /* ── Cart sidebar ── */
   .cart-sidebar { width: 100% !important; border-radius: 0 !important; }
-
-  /* ── Order modal — bottom sheet ── */
   .modal-overlay { align-items: flex-end !important; padding: 0 !important; }
   .modal {
     border-radius: 22px 22px 0 0 !important;
@@ -714,8 +688,6 @@ body { overflow-x: hidden; max-width: 100vw; }
     width:         100% !important;
     max-width:     100% !important;
   }
-
-  /* ── Payment modal — bottom sheet ── */
   .payment-modal-overlay { align-items: flex-end !important; padding: 0 !important; }
   .payment-modal {
     border-radius: 22px 22px 0 0 !important;
@@ -743,8 +715,6 @@ body { overflow-x: hidden; max-width: 100vw; }
   .card-type-icons   { flex-wrap: wrap !important; gap: 0.25rem !important; }
   .cf-row            { flex-direction: column !important; gap: 0.55rem !important; }
   .card-submit-btn   { font-size: 0.9rem !important; padding: 0.85rem !important; }
-
-  /* ── Order tracker ── */
   .order-tracker {
     bottom: 0 !important; left: 0 !important; right: 0 !important;
     width: 100% !important; border-radius: 20px 20px 0 0 !important;
@@ -754,8 +724,6 @@ body { overflow-x: hidden; max-width: 100vw; }
   .ot-step-icon  { width: 34px !important; height: 34px !important; font-size: 0.9rem !important; }
   .ot-step-label { font-size: 0.58rem !important; }
   .ot-body       { padding: 0.9rem 1rem 0.8rem !important; }
-
-  /* ── Footer ── */
   footer.footer, .footer {
     padding:    1.4rem 1rem !important;
     font-size:  0.8rem !important;
@@ -764,47 +732,27 @@ body { overflow-x: hidden; max-width: 100vw; }
 }
 
 /* ════════════════════════════════════════════════
-   MID-RANGE  480px – 768px  (larger phones / small tablets)
-   Two-column menu grid, bigger hero image, wider hero text
+   MID-RANGE  480px – 768px
    ════════════════════════════════════════════════ */
 @media (min-width: 480px) and (max-width: 768px) {
-
-  /* ── Navbar — slightly more breathing room ── */
-  nav.navbar {
-    padding: 0.8rem 1.25rem !important;
-  }
+  nav.navbar { padding: 0.8rem 1.25rem !important; }
   .nav-brand { font-size: 1.2rem !important; }
-
-  /* ── Hero — scale up a notch ── */
-  .hero, section.hero {
-    padding:    5.5rem 1.8rem 3rem !important;
-    gap:        2rem !important;
-  }
+  .hero, section.hero { padding: 5.5rem 1.8rem 3rem !important; gap: 2rem !important; }
   .hero h1 { font-size: clamp(2rem, 5.5vw, 2.5rem) !important; }
-  .hero-sub {
-    font-size: 0.92rem !important;
-    max-width: 420px !important;
-  }
+  .hero-sub { font-size: 0.92rem !important; max-width: 420px !important; }
   .hero-image { max-width: 260px !important; }
   .hero-img-circle { width: 230px !important; height: 230px !important; }
   .badge1 { bottom: 18px !important; left: -14px !important; }
   .badge2 { top: 18px !important;    right: -14px !important; }
-  .floating-badge {
-    font-size: 0.72rem !important;
-    padding:   0.32rem 0.85rem !important;
-  }
-
-  /* ── Menu — 2-column card grid ── */
+  .floating-badge { font-size: 0.72rem !important; padding: 0.32rem 0.85rem !important; }
   .menu-section  { padding: 3rem 1.5rem !important; }
   .section-header h2 { font-size: 1.7rem !important; }
-
   .menu-grid {
     display:               grid !important;
     grid-template-columns: repeat(2, 1fr) !important;
     gap:                   1rem !important;
     flex-direction:        unset !important;
   }
-  /* Revert to vertical card layout inside 2-col grid */
   .menu-card {
     display:               flex !important;
     flex-direction:        column !important;
@@ -819,45 +767,19 @@ body { overflow-x: hidden; max-width: 100vw; }
     object-fit:    cover !important;
     border-radius: 0 !important;
   }
-  .card-body {
-    padding:        0.75rem 0.9rem !important;
-    flex-direction: column !important;
-    gap:            0.4rem !important;
-  }
+  .card-body { padding: 0.75rem 0.9rem !important; flex-direction: column !important; gap: 0.4rem !important; }
   .card-name  { font-size: 0.92rem !important; }
-  .card-desc  {
-    font-size:          0.75rem !important;
-    -webkit-line-clamp: 2 !important;
-  }
+  .card-desc  { font-size: 0.75rem !important; -webkit-line-clamp: 2 !important; }
   .card-price { font-size: 0.98rem !important; }
-  .add-btn, .btn-add {
-    padding:       0.35rem 0.9rem !important;
-    font-size:     0.78rem !important;
-    align-self:    flex-start !important;
-  }
-
-  /* ── About — scale nicely ── */
-  .about-section, section.about-section, section#about {
-    padding: 3rem 1.5rem !important;
-    gap:     2rem !important;
-  }
+  .add-btn, .btn-add { padding: 0.35rem 0.9rem !important; font-size: 0.78rem !important; align-self: flex-start !important; }
+  .about-section, section.about-section, section#about { padding: 3rem 1.5rem !important; gap: 2rem !important; }
   .about-content h2 { font-size: 1.7rem !important; }
   .about-content p  { font-size: 0.92rem !important; }
   .about-img img    { max-height: 280px !important; }
-  .about-stats {
-    grid-template-columns: repeat(3, 1fr) !important;
-    gap:                   0.8rem !important;
-  }
+  .about-stats { grid-template-columns: repeat(3, 1fr) !important; gap: 0.8rem !important; }
   .stat span { font-size: 1.5rem !important; }
   .stat p    { font-size: 0.75rem !important; }
-
-  /* ── Cart sidebar — partial overlay, not full width ── */
-  .cart-sidebar {
-    width:         320px !important;
-    border-radius: 20px 0 0 20px !important;
-  }
-
-  /* ── Order / Payment modal — centred card, not bottom sheet ── */
+  .cart-sidebar { width: 320px !important; border-radius: 20px 0 0 20px !important; }
   .modal-overlay      { align-items: center !important; padding: 1rem !important; }
   .modal {
     border-radius: 20px !important;
@@ -866,10 +788,7 @@ body { overflow-x: hidden; max-width: 100vw; }
     max-height:    88vh !important;
     padding:       1.6rem 1.4rem 2rem !important;
   }
-  .payment-modal-overlay {
-    align-items: center !important;
-    padding:     1rem !important;
-  }
+  .payment-modal-overlay { align-items: center !important; padding: 1rem !important; }
   .payment-modal {
     border-radius: 20px !important;
     max-width:     440px !important;
@@ -877,78 +796,44 @@ body { overflow-x: hidden; max-width: 100vw; }
     max-height:    90vh !important;
     transform:     translateY(24px) scale(0.97) !important;
   }
-  .payment-modal-overlay.open .payment-modal {
-    transform: translateY(0) scale(1) !important;
-  }
+  .payment-modal-overlay.open .payment-modal { transform: translateY(0) scale(1) !important; }
   .pm-header     { padding: 1.4rem 1.6rem 1rem !important; }
   .pm-header h2  { font-size: 1.35rem !important; }
-  .pm-amount-badge {
-    font-size:   1.35rem !important;
-    padding:     0.32rem 1rem !important;
-    margin-top:  0.7rem !important;
-  }
+  .pm-amount-badge { font-size: 1.35rem !important; padding: 0.32rem 1rem !important; margin-top: 0.7rem !important; }
   .pm-panel { padding: 1.2rem 1.4rem !important; }
   .pm-tab   { font-size: 0.75rem !important; padding: 0.75rem 0.4rem !important; }
   .pm-tab .tab-icon { font-size: 1.1rem !important; }
-
   .upi-grid { grid-template-columns: repeat(3,1fr) !important; gap: 0.6rem !important; }
   .upi-app-btn { padding: 0.75rem 0.4rem !important; }
-  .upi-app-btn .app-logo-emoji {
-    width: 40px !important; height: 40px !important; font-size: 1.5rem !important;
-  }
+  .upi-app-btn .app-logo-emoji { width: 40px !important; height: 40px !important; font-size: 1.5rem !important; }
   .upi-app-btn .app-name { font-size: 0.65rem !important; }
   .upi-manual-row { flex-direction: row !important; }
   .upi-pay-btn    { width: auto !important; }
-
   #qrContainer    { width: 175px !important; height: 175px !important; }
-
   .card-preview   { min-height: 115px !important; padding: 1.1rem 1.2rem !important; }
   .card-number-display { font-size: 0.95rem !important; letter-spacing: 2px !important; }
   .cf-row         { flex-direction: row !important; gap: 0.7rem !important; }
-
-  /* ── Order tracker — bottom sheet still, but better sizing ── */
-  .order-tracker {
-    bottom: 0 !important; left: 0 !important; right: 0 !important;
-    width: 100% !important; border-radius: 20px 20px 0 0 !important;
-  }
+  .order-tracker { bottom: 0 !important; left: 0 !important; right: 0 !important; width: 100% !important; border-radius: 20px 20px 0 0 !important; }
   .ot-step-icon  { width: 36px !important; height: 36px !important; }
   .ot-step-label { font-size: 0.62rem !important; }
   .ot-body       { padding: 1rem 1.2rem !important; }
-
-  /* ── Footer ── */
-  footer.footer, .footer {
-    padding:   1.6rem 1.5rem !important;
-    font-size: 0.82rem !important;
-  }
+  footer.footer, .footer { padding: 1.6rem 1.5rem !important; font-size: 0.82rem !important; }
 }
 
 /* ════════════════════════════════════════════════
    COMPACT PHONES  400px – 479px
-   Single-column list cards, tight hero, optimised modals
    ════════════════════════════════════════════════ */
 @media (min-width: 400px) and (max-width: 479px) {
-
-  /* ── Hero ── */
   .hero, section.hero { padding: 5rem 1.3rem 2.5rem !important; gap: 1.8rem !important; }
   .hero h1             { font-size: 1.85rem !important; }
   .hero-sub            { max-width: 320px !important; font-size: 0.9rem !important; }
   .hero-image          { max-width: 200px !important; }
   .hero-img-circle     { width: 170px !important; height: 170px !important; }
-
-  /* ── Menu card — slightly wider image column ── */
-  .menu-card {
-    grid-template-columns: 100px 1fr !important;
-    min-height:            100px !important;
-  }
-  .menu-card img, .card-img {
-    width:      100px !important;
-    min-height: 100px !important;
-  }
+  .menu-card { grid-template-columns: 100px 1fr !important; min-height: 100px !important; }
+  .menu-card img, .card-img { width: 100px !important; min-height: 100px !important; }
   .card-body  { padding: 0.7rem 0.85rem !important; }
   .card-name  { font-size: 0.92rem !important; }
   .card-price { font-size: 0.95rem !important; }
-
-  /* ── Payment modal — bottom sheet ── */
   .payment-modal-overlay { align-items: flex-end !important; padding: 0 !important; }
   .payment-modal {
     border-radius: 22px 22px 0 0 !important;
@@ -960,15 +845,8 @@ body { overflow-x: hidden; max-width: 100vw; }
   .upi-manual-row { flex-direction: column !important; }
   .upi-pay-btn    { width: 100% !important; }
   .cf-row         { flex-direction: column !important; gap: 0.55rem !important; }
-
-  /* ── Cart sidebar — full width ── */
   .cart-sidebar   { width: 100% !important; border-radius: 0 !important; }
-
-  /* ── About stats ── */
-  .about-stats {
-    grid-template-columns: repeat(3, 1fr) !important;
-    gap: 0.5rem !important;
-  }
+  .about-stats { grid-template-columns: repeat(3, 1fr) !important; gap: 0.5rem !important; }
   .stat span { font-size: 1.2rem !important; }
   .stat p    { font-size: 0.7rem !important; }
 }
@@ -981,10 +859,7 @@ body { overflow-x: hidden; max-width: 100vw; }
   .hero-sub                  { max-width: 260px !important; }
   .hero-img-circle           { width: 155px !important; height: 155px !important; }
   .floating-badge            { display: none !important; }
-  .menu-card {
-    grid-template-columns: 80px 1fr !important;
-    min-height: 82px !important;
-  }
+  .menu-card { grid-template-columns: 80px 1fr !important; min-height: 82px !important; }
   .menu-card img, .card-img  { width: 80px !important; min-height: 82px !important; }
   .card-body  { padding: 0.5rem 0.7rem !important; }
   .card-name  { font-size: 0.85rem !important; }
@@ -997,7 +872,7 @@ body { overflow-x: hidden; max-width: 100vw; }
 }
 
 /* ══════════════════════════════════════════════
-   SUCCESS OVERLAY POPUPS (unchanged)
+   SUCCESS OVERLAY POPUPS
    ══════════════════════════════════════════════ */
 .success-overlay {
   position: fixed; inset: 0;
@@ -1025,6 +900,72 @@ body { overflow-x: hidden; max-width: 100vw; }
 @keyframes soPopIn {
   from { transform: scale(0.7); opacity: 0; }
   to   { transform: scale(1);   opacity: 1; }
+}
+</style>
+
+<style>
+/* ── Location Section ── */
+.location-section {
+  background: linear-gradient(135deg, #1A0F0A 0%, #3D1A0A 100%);
+  padding: 4rem 2rem;
+  color: #fff;
+  text-align: center;
+}
+.location-section .section-tag {
+  font-size: .75rem; letter-spacing: 3px;
+  text-transform: uppercase; color: #EDD8C8;
+  margin-bottom: .5rem; display: block;
+}
+.location-section h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 2rem; font-weight: 900;
+  color: #fff; margin-bottom: .5rem;
+}
+.location-section .loc-sub {
+  color: #c9a899; font-size: .95rem;
+  margin-bottom: 2rem;
+}
+.location-map-wrap {
+  max-width: 700px; margin: 0 auto 2rem;
+  border-radius: 20px; overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.45);
+  border: 3px solid rgba(255,255,255,.1);
+  height: 320px;
+}
+.location-map-wrap iframe {
+  width: 100%; height: 100%; border: none; display: block;
+}
+.loc-info-grid {
+  display: flex; flex-wrap: wrap; justify-content: center;
+  gap: 1.2rem; max-width: 700px; margin: 0 auto 2rem;
+}
+.loc-info-card {
+  background: rgba(255,255,255,.08);
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 14px; padding: 1.2rem 1.5rem;
+  min-width: 180px; flex: 1;
+  text-align: left;
+}
+.loc-info-card .lic-icon { font-size: 1.6rem; display: block; margin-bottom: .5rem; }
+.loc-info-card .lic-label { font-size: .7rem; color: #c9a899; text-transform: uppercase; letter-spacing: 1.5px; display: block; margin-bottom: .25rem; }
+.loc-info-card .lic-val { font-size: .92rem; color: #fff; font-weight: 600; line-height: 1.4; }
+.loc-directions-btn {
+  display: inline-flex; align-items: center; gap: .5rem;
+  background: #C8460A; color: #fff;
+  border: none; border-radius: 50px;
+  padding: .85rem 2rem; font-size: .95rem; font-weight: 700;
+  cursor: pointer; text-decoration: none;
+  font-family: 'DM Sans', sans-serif;
+  transition: background .2s, transform .15s;
+  box-shadow: 0 6px 24px rgba(200,70,10,.4);
+}
+.loc-directions-btn:hover { background: #E85D1E; transform: translateY(-2px); }
+@media (max-width: 600px) {
+  .location-section { padding: 3rem 1rem; }
+  .location-section h2 { font-size: 1.5rem; }
+  .location-map-wrap { height: 220px; border-radius: 14px; }
+  .loc-info-grid { flex-direction: column; gap: .8rem; }
+  .loc-info-card { min-width: unset; }
 }
 </style>
 </head>
@@ -1137,12 +1078,10 @@ body { overflow-x: hidden; max-width: 100vw; }
 
 <!-- ══════════════════════════════════════════════════════════
      PAYMENT MODAL — Tabs: QR Code | UPI Apps | Debit/Credit
-     No close button — closes only when admin confirms payment
      ══════════════════════════════════════════════════════════ -->
 <div class="payment-modal-overlay" id="paymentModal">
   <div class="payment-modal">
 
-    <!-- Header -->
     <div class="pm-header">
       <span class="pm-icon">🔒</span>
       <h2>Secure Payment</h2>
@@ -1150,7 +1089,6 @@ body { overflow-x: hidden; max-width: 100vw; }
       <div class="pm-amount-badge" id="pmAmount">₹0</div>
     </div>
 
-    <!-- ── Tab bar ── -->
     <div class="pm-tabs" id="pmTabBar">
       <button class="pm-tab active" onclick="switchPmTab('qr', this)">
         <span class="tab-icon">📷</span>QR Code
@@ -1163,7 +1101,7 @@ body { overflow-x: hidden; max-width: 100vw; }
       </button>
     </div>
 
-    <!-- ══ PANEL 1: QR Code ══ -->
+    <!-- PANEL 1: QR Code -->
     <div class="pm-panel active" id="panelQr">
       <div id="qrContainer">
         <img src="qr.jpeg" alt="Scan to Pay" style="width:100%;height:100%;object-fit:contain;border-radius:8px;">
@@ -1183,13 +1121,10 @@ body { overflow-x: hidden; max-width: 100vw; }
       </p>
     </div>
 
-    <!-- ══ PANEL 2: UPI Apps ══ -->
+    <!-- PANEL 2: UPI Apps -->
     <div class="pm-panel" id="panelUpi">
-
-      <!-- App grid — deep-links open the specific app on Android -->
       <div class="upi-grid" id="upiAppGrid">
 
-        <!-- GPay -->
         <a class="upi-app-btn" id="upiGpay" href="#" onclick="openUpiApp('gpay'); return false;">
           <div class="app-logo-emoji" style="background:linear-gradient(135deg,#4285F4,#34A853);">
             <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f2/Google_Pay_Logo.svg/120px-Google_Pay_Logo.svg.png"
@@ -1199,7 +1134,6 @@ body { overflow-x: hidden; max-width: 100vw; }
           <span class="app-name">Google Pay</span>
         </a>
 
-        <!-- PhonePe -->
         <a class="upi-app-btn" id="upiPhonepe" href="#" onclick="openUpiApp('phonepe'); return false;">
           <div class="app-logo-emoji" style="background:#6739B7;">
             <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/PhonePe_Logo.svg/120px-PhonePe_Logo.svg.png"
@@ -1209,7 +1143,6 @@ body { overflow-x: hidden; max-width: 100vw; }
           <span class="app-name">PhonePe</span>
         </a>
 
-        <!-- Paytm -->
         <a class="upi-app-btn" id="upiPaytm" href="#" onclick="openUpiApp('paytm'); return false;">
           <div class="app-logo-emoji" style="background:#00B9F1;">
             <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Paytm_Logo_%28standalone%29.svg/120px-Paytm_Logo_%28standalone%29.svg.png"
@@ -1219,7 +1152,6 @@ body { overflow-x: hidden; max-width: 100vw; }
           <span class="app-name">Paytm</span>
         </a>
 
-        <!-- Amazon Pay -->
         <a class="upi-app-btn" id="upiAmazon" href="#" onclick="openUpiApp('amazon'); return false;">
           <div class="app-logo-emoji" style="background:#FF9900;">
             <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Amazon_logo.svg/120px-Amazon_logo.svg.png"
@@ -1229,7 +1161,6 @@ body { overflow-x: hidden; max-width: 100vw; }
           <span class="app-name">Amazon Pay</span>
         </a>
 
-        <!-- BHIM -->
         <a class="upi-app-btn" id="upiBhim" href="#" onclick="openUpiApp('bhim'); return false;">
           <div class="app-logo-emoji" style="background:#00529B;">
             <img src="https://upload.wikimedia.org/wikipedia/en/thumb/a/a2/BHIM_logo.png/120px-BHIM_logo.png"
@@ -1239,7 +1170,6 @@ body { overflow-x: hidden; max-width: 100vw; }
           <span class="app-name">BHIM UPI</span>
         </a>
 
-        <!-- WhatsApp Pay -->
         <a class="upi-app-btn" id="upiWhatsapp" href="#" onclick="openUpiApp('whatsapp'); return false;">
           <div class="app-logo-emoji" style="background:#25D366;">
             <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6b/WhatsApp.svg/120px-WhatsApp.svg.png"
@@ -1249,7 +1179,6 @@ body { overflow-x: hidden; max-width: 100vw; }
           <span class="app-name">WhatsApp Pay</span>
         </a>
 
-        <!-- Jio Pay -->
         <a class="upi-app-btn" id="upiJio" href="#" onclick="openUpiApp('jio'); return false;">
           <div class="app-logo-emoji" style="background:#003087;">
             <span style="font-size:1.2rem;font-weight:900;color:#fff;">JIO</span>
@@ -1257,7 +1186,6 @@ body { overflow-x: hidden; max-width: 100vw; }
           <span class="app-name">Jio Pay</span>
         </a>
 
-        <!-- MobiKwik -->
         <a class="upi-app-btn" id="upiMobikwik" href="#" onclick="openUpiApp('mobikwik'); return false;">
           <div class="app-logo-emoji" style="background:#0066FF;">
             <span style="font-size:1.1rem;font-weight:900;color:#fff;">MK</span>
@@ -1265,7 +1193,6 @@ body { overflow-x: hidden; max-width: 100vw; }
           <span class="app-name">MobiKwik</span>
         </a>
 
-        <!-- Freecharge -->
         <a class="upi-app-btn" id="upiFreech" href="#" onclick="openUpiApp('freecharge'); return false;">
           <div class="app-logo-emoji" style="background:#E4202A;">
             <span style="font-size:1rem;font-weight:900;color:#fff;">FC</span>
@@ -1273,7 +1200,7 @@ body { overflow-x: hidden; max-width: 100vw; }
           <span class="app-name">Freecharge</span>
         </a>
 
-      </div><!-- /upi-grid -->
+      </div>
 
       <div class="upi-or-divider">or enter UPI ID manually</div>
 
@@ -1284,13 +1211,11 @@ body { overflow-x: hidden; max-width: 100vw; }
         <button class="upi-pay-btn" onclick="payManualUpi()">Pay Now</button>
       </div>
       <div class="upi-err" id="upiManualErr">⚠ Enter a valid UPI ID (e.g. name@bank)</div>
+    </div>
 
-    </div><!-- /panelUpi -->
-
-    <!-- ══ PANEL 3: Debit / Credit Card ══ -->
+    <!-- PANEL 3: Debit / Credit Card -->
     <div class="pm-panel" id="panelCard">
 
-      <!-- Visual card preview -->
       <div class="card-preview" id="cardPreview">
         <span class="card-chip">💳</span>
         <div class="card-number-display" id="cardNumDisplay">•••• •••• •••• ••••</div>
@@ -1307,7 +1232,6 @@ body { overflow-x: hidden; max-width: 100vw; }
         <div class="card-type-badge" id="cardTypeBadge">CARD</div>
       </div>
 
-      <!-- Card type indicators -->
       <div class="card-type-icons" style="margin-bottom:0.8rem;">
         <span class="cti" id="cti-visa">VISA</span>
         <span class="cti" id="cti-mc">MASTER</span>
@@ -1317,9 +1241,7 @@ body { overflow-x: hidden; max-width: 100vw; }
         <span class="cti" id="cti-discover">DISCOVER</span>
       </div>
 
-      <!-- Card form -->
       <div class="card-form" id="cardForm">
-
         <div class="cf-group">
           <label>Card Number</label>
           <input type="text" id="cfCardNum"
@@ -1372,12 +1294,10 @@ body { overflow-x: hidden; max-width: 100vw; }
         </button>
 
         <p class="secure-note">🔐 256-bit SSL encrypted · Your card details are safe</p>
+      </div>
+    </div>
 
-      </div><!-- /card-form -->
-
-    </div><!-- /panelCard -->
-
-    <!-- ══ Waiting panel — shown after any payment initiated ══ -->
+    <!-- Waiting panel -->
     <div class="pm-waiting-panel" id="pmWaiting">
       <div class="pm-waiting-spinner"></div>
       <div class="pm-waiting-title">Waiting for Confirmation…</div>
@@ -1388,8 +1308,8 @@ body { overflow-x: hidden; max-width: 100vw; }
       <p class="pm-order-ref" id="pmOrderRef">Order #—</p>
     </div>
 
-  </div><!-- /.payment-modal -->
-</div><!-- /.payment-modal-overlay -->
+  </div>
+</div>
 
 <!-- Copy flash toast -->
 <div class="copy-flash" id="copyFlash">📋 Copied!</div>
@@ -1397,13 +1317,8 @@ body { overflow-x: hidden; max-width: 100vw; }
 <!-- SUCCESS TOAST -->
 <div class="toast" id="toast"></div>
 
-<!-- ══════════════════════════════════════════════════════
-     LIVE ORDER STATUS TRACKER WIDGET
-     Appears after order placement — updates automatically
-     when admin changes status (no page refresh needed)
-     ══════════════════════════════════════════════════════ -->
+<!-- ORDER STATUS TRACKER -->
 <style>
-/* ── Tracker widget ── */
 .order-tracker {
   position: fixed;
   bottom: 1.5rem; right: 1.5rem;
@@ -1424,17 +1339,12 @@ body { overflow-x: hidden; max-width: 100vw; }
   opacity: 1;
   pointer-events: all;
 }
-
-/* header */
 .ot-header {
   background: linear-gradient(135deg, #1A0F0A, #3D1A0A);
   padding: 0.9rem 1.1rem;
   display: flex; align-items: center; justify-content: space-between;
 }
-.ot-title {
-  color: #fff; font-size: 0.85rem; font-weight: 700;
-  display: flex; align-items: center; gap: 0.4rem;
-}
+.ot-title { color: #fff; font-size: 0.85rem; font-weight: 700; display: flex; align-items: center; gap: 0.4rem; }
 .ot-order-num { color: #EDD8C8; font-size: 0.75rem; margin-top: 1px; }
 .ot-close {
   background: rgba(255,255,255,0.12); border: none;
@@ -1444,24 +1354,11 @@ body { overflow-x: hidden; max-width: 100vw; }
   transition: background 0.2s;
 }
 .ot-close:hover { background: rgba(255,255,255,0.25); }
-
-/* steps */
 .ot-body { padding: 1.1rem 1.2rem 0.9rem; }
-
-.ot-steps {
-  display: flex; align-items: center;
-  justify-content: space-between;
-  margin-bottom: 0.9rem;
-}
-.ot-step {
-  display: flex; flex-direction: column;
-  align-items: center; gap: 4px;
-  flex: 1;
-  position: relative;
-}
+.ot-steps { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.9rem; }
+.ot-step { display: flex; flex-direction: column; align-items: center; gap: 4px; flex: 1; position: relative; }
 .ot-step-icon {
-  width: 40px; height: 40px;
-  border-radius: 50%;
+  width: 40px; height: 40px; border-radius: 50%;
   background: #f0ebe7;
   display: flex; align-items: center; justify-content: center;
   font-size: 1.1rem;
@@ -1469,10 +1366,7 @@ body { overflow-x: hidden; max-width: 100vw; }
   transition: background 0.4s, border-color 0.4s, transform 0.3s;
   position: relative; z-index: 2;
 }
-.ot-step.done .ot-step-icon {
-  background: #D4EDDA; border-color: #2C7A2C;
-  transform: scale(1.1);
-}
+.ot-step.done .ot-step-icon { background: #D4EDDA; border-color: #2C7A2C; transform: scale(1.1); }
 .ot-step.active .ot-step-icon {
   background: #FFF3CD; border-color: #C8460A;
   animation: stepPulse 1.8s ease-in-out infinite;
@@ -1482,66 +1376,22 @@ body { overflow-x: hidden; max-width: 100vw; }
   0%,100% { box-shadow: 0 0 0 0 rgba(200,70,10,0.3); }
   50%      { box-shadow: 0 0 0 8px rgba(200,70,10,0); }
 }
-.ot-step-label {
-  font-size: 0.65rem; font-weight: 600;
-  color: #bbb; text-transform: uppercase; letter-spacing: 0.3px;
-  text-align: center; line-height: 1.2;
-  transition: color 0.3s;
-}
+.ot-step-label { font-size: 0.65rem; font-weight: 600; color: #bbb; text-transform: uppercase; letter-spacing: 0.3px; text-align: center; line-height: 1.2; transition: color 0.3s; }
 .ot-step.done .ot-step-label  { color: #2C7A2C; }
 .ot-step.active .ot-step-label { color: #C8460A; }
-
-/* connector lines */
-.ot-line {
-  flex: 1; height: 2px;
-  background: #EDD8C8;
-  margin: 0 4px;
-  margin-bottom: 18px; /* align with icon centres */
-  position: relative;
-  overflow: hidden;
-}
-.ot-line-fill {
-  position: absolute; inset: 0;
-  background: #2C7A2C;
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform 0.6s ease;
-}
+.ot-line { flex: 1; height: 2px; background: #EDD8C8; margin: 0 4px; margin-bottom: 18px; position: relative; overflow: hidden; }
+.ot-line-fill { position: absolute; inset: 0; background: #2C7A2C; transform: scaleX(0); transform-origin: left; transition: transform 0.6s ease; }
 .ot-line.filled .ot-line-fill { transform: scaleX(1); }
-
-/* status text */
-.ot-status-text {
-  font-size: 0.82rem; color: #8B6355;
-  text-align: center;
-  padding-top: 0.2rem;
-  min-height: 1.2em;
-  transition: color 0.3s;
-}
+.ot-status-text { font-size: 0.82rem; color: #8B6355; text-align: center; padding-top: 0.2rem; min-height: 1.2em; transition: color 0.3s; }
 .ot-status-text.served { color: #2C7A2C; font-weight: 700; }
 .ot-status-text.cancelled { color: #C8460A; }
-
-/* live pulse dot */
-.ot-live {
-  display: flex; align-items: center; gap: 5px;
-  font-size: 0.68rem; color: #aaa;
-  justify-content: center;
-  margin-top: 0.5rem;
-  padding-bottom: 0.1rem;
-}
-.ot-live-dot {
-  width: 6px; height: 6px; border-radius: 50%;
-  background: #28a745;
-  animation: livePulse 2s ease-in-out infinite;
-}
-@keyframes livePulse {
-  0%,100% { opacity:1; transform:scale(1); }
-  50%     { opacity:0.3; transform:scale(0.7); }
-}
+.ot-live { display: flex; align-items: center; gap: 5px; font-size: 0.68rem; color: #aaa; justify-content: center; margin-top: 0.5rem; padding-bottom: 0.1rem; }
+.ot-live-dot { width: 6px; height: 6px; border-radius: 50%; background: #28a745; animation: livePulse 2s ease-in-out infinite; }
+@keyframes livePulse { 0%,100% { opacity:1; transform:scale(1); } 50% { opacity:0.3; transform:scale(0.7); } }
 .ot-live-dot.stopped { background:#aaa; animation:none; }
 </style>
 
 <div class="order-tracker" id="orderTracker">
-  <!-- drag handle for mobile -->
   <div style="display:flex;justify-content:center;padding:8px 0 0;"><div style="width:36px;height:4px;border-radius:4px;background:rgba(255,255,255,0.25);"></div></div>
   <div class="ot-header">
     <div>
@@ -1552,29 +1402,20 @@ body { overflow-x: hidden; max-width: 100vw; }
   </div>
   <div class="ot-body">
     <div class="ot-steps">
-
-      <!-- Step 1: Received / Pending -->
       <div class="ot-step" id="otStep-pending">
         <div class="ot-step-icon">📋</div>
         <div class="ot-step-label">Received</div>
       </div>
-
       <div class="ot-line" id="otLine-1"><div class="ot-line-fill"></div></div>
-
-      <!-- Step 2: Preparing -->
       <div class="ot-step" id="otStep-preparing">
         <div class="ot-step-icon">👨‍🍳</div>
         <div class="ot-step-label">Preparing</div>
       </div>
-
       <div class="ot-line" id="otLine-2"><div class="ot-line-fill"></div></div>
-
-      <!-- Step 3: Served -->
       <div class="ot-step" id="otStep-served">
         <div class="ot-step-icon">✅</div>
         <div class="ot-step-label">Served</div>
       </div>
-
     </div>
     <div class="ot-status-text" id="otStatusText">Waiting for kitchen…</div>
     <div class="ot-live">
@@ -1584,34 +1425,83 @@ body { overflow-x: hidden; max-width: 100vw; }
   </div>
 </div>
 
+<section class="location-section" id="location">
+  <span class="section-tag">Find Us</span>
+  <h2>📍 Visit Our Restaurant</h2>
+  <p class="loc-sub">Come dine with us — we'd love to see you in person!</p>
+ 
+  <!-- 
+    ╔══════════════════════════════════════════════════════╗
+    ║  REPLACE the src below with your actual Google Maps  ║
+    ║  embed URL for your restaurant location.             ║
+    ║  Go to: maps.google.com → Your Location →           ║
+    ║  Share → Embed a map → Copy HTML → paste src here   ║
+    ╚══════════════════════════════════════════════════════╝
+  -->
+  <div class="location-map-wrap">
+    <iframe
+      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3684.1234567890!2d88.3634567!3d22.5726459!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjLCsDM0JzIxLjUiTiA4OMKwMjEnNDguNCJF!5e0!3m2!1sen!2sin!4v1234567890"
+      allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+      title="Spice & Soul Restaurant Location">
+    </iframe>
+  </div>
+ 
+  <div class="loc-info-grid">
+    <div class="loc-info-card">
+      <span class="lic-icon">🏠</span>
+      <span class="lic-label">Address</span>
+      <span class="lic-val">Park Street, Kolkata<br>West Bengal 700016</span>
+    </div>
+    <div class="loc-info-card">
+      <span class="lic-icon">🕐</span>
+      <span class="lic-label">Hours</span>
+      <span class="lic-val">Mon – Sun<br>11:00 AM – 11:00 PM</span>
+    </div>
+    <div class="loc-info-card">
+      <span class="lic-icon">📞</span>
+      <span class="lic-label">Phone</span>
+      <span class="lic-val"><a href="tel:+919876543210" style="color:#fff;text-decoration:none;">+91 98765 43210</a></span>
+    </div>
+    <div class="loc-info-card">
+      <span class="lic-icon">🚗</span>
+      <span class="lic-label">Parking</span>
+      <span class="lic-val">Free parking<br>available nearby</span>
+    </div>
+  </div>
+ 
+  <a class="loc-directions-btn"
+     href="https://www.google.com/maps/dir/?api=1&destination=Park+Street+Kolkata"
+     target="_blank" rel="noopener">
+    🗺 Get Directions on Google Maps
+  </a>
+</section>
+
 <footer class="footer">
   <p>🍽 Spice &amp; Soul Restaurant · Kolkata · Made with ❤️</p>
 </footer>
 
-<!-- QR code library -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-<!-- Main app logic (unchanged) -->
 <script src="js/app.js"></script>
 
 <script>
 // ═══════════════════════════════════════════════════════════════════
 //  PAYMENT MODAL — Full handler
-//  Supports: QR Code | UPI Apps | Debit/Credit Card
-//  Admin confirmation flow is identical for all methods
+//  FIX: UPI_NAME is plain text (not pre-encoded). All URL params
+//       are encoded inside buildUpiLink using encodeURIComponent
+//       so they never get double-encoded, which caused GPay to
+//       show "could not show bank name".
 // ═══════════════════════════════════════════════════════════════════
 
-const UPI_ID  = 'sujanbetal18-1@okaxis';
-const UPI_NAME = 'Spice%20%26%20Soul';
+const UPI_ID   = 'sujanbetal18-1@okaxis';
+const UPI_NAME = 'Spice Soul';          // ✅ plain text — no pre-encoding
 
 let paymentCheckTimer = null;
 let _currentOrderId   = null;
 let _currentAmount    = 0;
 
-/* ── Device detection ────────────────────────────────── */
 const _isIOS     = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
 const _isAndroid = /Android/.test(navigator.userAgent);
 
-/* ── App Store / Play Store links ────────────────────── */
 const APP_STORE = {
   gpay      : { ios: 'https://apps.apple.com/app/google-pay/id1481099965',      android: 'https://play.google.com/store/apps/details?id=com.google.android.apps.nbu.paisa.user' },
   phonepe   : { ios: 'https://apps.apple.com/app/phonepe/id1146674610',          android: 'https://play.google.com/store/apps/details?id=com.phonepe.app' },
@@ -1629,29 +1519,32 @@ const APP_NAMES = {
   amazon:'Amazon Pay', bhim:'BHIM UPI'
 };
 
-/* ── Build deep links (Android & iOS schemes) ─────────── */
+/* ── Build UPI deep link — all params properly encoded ── */
 function buildUpiLink(app, amount, orderId) {
-  const base    = `pa=${UPI_ID}&pn=${UPI_NAME}&am=${amount}&cu=INR&tn=Order%23${orderId}`;
-  // iOS uses the same app-specific schemes; generic upi:// does NOT work on iOS
+  const pa = encodeURIComponent(UPI_ID);
+  const pn = encodeURIComponent(UPI_NAME);          // ✅ encode here, not at declaration
+  const am = parseFloat(amount).toFixed(2);
+  const tn = encodeURIComponent('Order ' + orderId); // ✅ no # symbol — GPay rejects it
+
+  const base = 'pa=' + pa + '&pn=' + pn + '&am=' + am + '&cu=INR&tn=' + tn;
+
   const schemes = {
-    gpay      : `tez://upi/pay?${base}`,          // GPay: same scheme on iOS & Android
-    phonepe   : `phonepe://pay?${base}`,           // PhonePe: same on both
-    paytm     : `paytmmp://upi/pay?${base}`,       // Paytm
-    amazon    : `amazonpay://extras?${base}`,      // Amazon Pay
-    bhim      : `bhim://pay?${base}`,              // BHIM — iOS uses bhim:// not upi://
+    gpay      : 'tez://upi/pay?'     + base,   // GPay official scheme (Android + iOS)
+    phonepe   : 'phonepe://pay?'     + base,   // PhonePe
+    paytm     : 'paytmmp://upi/pay?' + base,   // Paytm
+    amazon    : 'amazonpay://pay?'   + base,   // Amazon Pay
+    bhim      : 'bhim://pay?'        + base,   // BHIM
   };
-  return schemes[app] || `upi://pay?${base}`;
+  return schemes[app] || ('upi://pay?' + base); // generic fallback for others
 }
 
-/* ── Smart deep-link launcher (Android + iOS) ─────────── */
+/* ── Smart deep-link launcher ── */
 function tryDeepLink(link, onSuccess, onFail) {
   let left = true;
 
-  // visibilitychange fires when the browser goes to background (app opened)
   function onHide() {
     if (document.hidden) { left = true; cleanup(); onSuccess(); }
   }
-  // pagehide fires on some iOS versions
   function onPageHide() { left = true; cleanup(); onSuccess(); }
 
   function cleanup() {
@@ -1662,17 +1555,14 @@ function tryDeepLink(link, onSuccess, onFail) {
   document.addEventListener('visibilitychange', onHide);
   window.addEventListener('pagehide', onPageHide);
 
-  // Attempt to open the deep link
   const iframe = document.createElement('iframe');
   iframe.style.display = 'none';
   iframe.src = link;
   document.body.appendChild(iframe);
   setTimeout(() => document.body.removeChild(iframe), 500);
 
-  // Also try direct navigation (needed for some iOS apps)
   try { window.location.href = link; } catch(e) {}
 
-  // If page is still visible after 2.2 s → app not installed
   setTimeout(() => {
     cleanup();
     if (!document.hidden) onFail();
@@ -1680,72 +1570,58 @@ function tryDeepLink(link, onSuccess, onFail) {
   }, 2200);
 }
 
-/* ── Open UPI app button ─────────────────────────────── */
+/* ── Open UPI app ── */
 function openUpiApp(app) {
   if (!_currentOrderId) return;
 
-  // WhatsApp Pay is not available on iPhone
   if (app === 'whatsapp' && _isIOS) {
     showNotFoundPanel(app, true); return;
   }
 
-  const link = buildUpiLink(app, _currentAmount.toFixed(2), _currentOrderId);
+  const link = buildUpiLink(app, _currentAmount, _currentOrderId);
 
   tryDeepLink(
     link,
-    () => showWaitingPanel(),          // ✅ app opened
-    () => showNotFoundPanel(app, false) // ❌ app not installed
+    () => showWaitingPanel(),
+    () => showNotFoundPanel(app, false)
   );
 }
 
-/* ── App-not-found fallback panel ─────────────────────── */
+/* ── App-not-found fallback panel ── */
 function showNotFoundPanel(app, iosUnavailable) {
-  const name    = APP_NAMES[app] || app;
+  const name     = APP_NAMES[app] || app;
   const storeUrl = _isIOS
     ? (APP_STORE[app] ? APP_STORE[app].ios     : null)
     : (APP_STORE[app] ? APP_STORE[app].android : null);
   const storeLabel = _isIOS ? '🍎 Download on App Store' : '▶ Get on Play Store';
   const msg = iosUnavailable
-    ? `${name} is not available on iPhone. Please use another payment method.`
-    : `${name} app not found on your device.`;
+    ? name + ' is not available on iPhone. Please use another payment method.'
+    : name + ' app not found on your device.';
 
-  // Build small fallback box inside the UPI panel
   let existing = document.getElementById('upiNotFound');
   if (existing) existing.remove();
 
   const box = document.createElement('div');
   box.id = 'upiNotFound';
-  box.style.cssText = `
-    background:#FFF3ED; border:1.5px solid #EDD8C8; border-radius:14px;
-    padding:1rem 1.2rem; margin-top:0.8rem; text-align:center;
-    font-family:'DM Sans',sans-serif; animation: cardIn 0.3s ease;
-  `;
-  box.innerHTML = `
-    <div style="font-size:1.6rem;margin-bottom:0.3rem;">⚠️</div>
-    <div style="font-weight:700;color:#1A0F0A;font-size:0.9rem;margin-bottom:0.3rem;">${msg}</div>
-    <div style="font-size:0.78rem;color:#8B6355;margin-bottom:0.8rem;">
-      ${iosUnavailable ? 'Try Google Pay, PhonePe or Paytm instead.' : 'Install the app or use another method below.'}
-    </div>
-    <div style="display:flex;gap:0.5rem;justify-content:center;flex-wrap:wrap;">
-      ${storeUrl && !iosUnavailable ? `<a href="${storeUrl}" target="_blank" style="
-        background:#C8460A;color:#fff;border-radius:20px;padding:0.5rem 1rem;
-        font-size:0.78rem;font-weight:700;text-decoration:none;">${storeLabel}</a>` : ''}
-      <button onclick="switchPmTab('qr', document.querySelectorAll('.pm-tab')[0]); this.closest('#upiNotFound').remove();" style="
-        background:#1A0F0A;color:#fff;border:none;border-radius:20px;
-        padding:0.5rem 1rem;font-size:0.78rem;font-weight:700;cursor:pointer;">
-        📷 Use QR Code
-      </button>
-      <button onclick="this.closest('#upiNotFound').remove();" style="
-        background:#f0ebe7;color:#2C1810;border:none;border-radius:20px;
-        padding:0.5rem 1rem;font-size:0.78rem;font-weight:700;cursor:pointer;">
-        ← Try Another
-      </button>
-    </div>`;
+  box.style.cssText = 'background:#FFF3ED;border:1.5px solid #EDD8C8;border-radius:14px;padding:1rem 1.2rem;margin-top:0.8rem;text-align:center;font-family:\'DM Sans\',sans-serif;';
+  box.innerHTML =
+    '<div style="font-size:1.6rem;margin-bottom:0.3rem;">⚠️</div>' +
+    '<div style="font-weight:700;color:#1A0F0A;font-size:0.9rem;margin-bottom:0.3rem;">' + msg + '</div>' +
+    '<div style="font-size:0.78rem;color:#8B6355;margin-bottom:0.8rem;">' +
+      (iosUnavailable ? 'Try Google Pay, PhonePe or Paytm instead.' : 'Install the app or use another method below.') +
+    '</div>' +
+    '<div style="display:flex;gap:0.5rem;justify-content:center;flex-wrap:wrap;">' +
+      (storeUrl && !iosUnavailable
+        ? '<a href="' + storeUrl + '" target="_blank" style="background:#C8460A;color:#fff;border-radius:20px;padding:0.5rem 1rem;font-size:0.78rem;font-weight:700;text-decoration:none;">' + storeLabel + '</a>'
+        : '') +
+      '<button onclick="switchPmTab(\'qr\', document.querySelectorAll(\'.pm-tab\')[0]); this.closest(\'#upiNotFound\').remove();" style="background:#1A0F0A;color:#fff;border:none;border-radius:20px;padding:0.5rem 1rem;font-size:0.78rem;font-weight:700;cursor:pointer;">📷 Use QR Code</button>' +
+      '<button onclick="this.closest(\'#upiNotFound\').remove();" style="background:#f0ebe7;color:#2C1810;border:none;border-radius:20px;padding:0.5rem 1rem;font-size:0.78rem;font-weight:700;cursor:pointer;">← Try Another</button>' +
+    '</div>';
 
   document.getElementById('panelUpi').appendChild(box);
 }
 
-/* ── Pay via manually entered UPI ID ─────────────────── */
+/* ── Pay via manually entered UPI ID — fixed encoding ── */
 function payManualUpi() {
   const val = document.getElementById('manualUpiInput').value.trim();
   const err = document.getElementById('upiManualErr');
@@ -1754,19 +1630,22 @@ function payManualUpi() {
   }
   err.style.display = 'none';
 
-  // Generic upi:// works on Android; on iOS we try it but show fallback if needed
-  const link = `upi://pay?pa=${encodeURIComponent(val)}&pn=${UPI_NAME}&am=${_currentAmount.toFixed(2)}&cu=INR&tn=Order%23${_currentOrderId}`;
+  // ✅ All params encoded properly — no double-encoding, no # in tn
+  const link = 'upi://pay?' +
+    'pa=' + encodeURIComponent(val) +
+    '&pn=' + encodeURIComponent(UPI_NAME) +
+    '&am=' + _currentAmount.toFixed(2) +
+    '&cu=INR' +
+    '&tn=' + encodeURIComponent('Order ' + _currentOrderId);
 
   if (_isIOS) {
-    // On iOS, show copy + instruction if upi:// doesn't work
     tryDeepLink(link, showWaitingPanel, () => {
-      // Show copy UPI ID suggestion as fallback
       const f = document.getElementById('copyFlash');
       f.textContent = '⚠️ Open your UPI app manually & pay to: ' + UPI_ID;
       f.style.maxWidth = '90vw';
       f.style.borderRadius = '12px';
       f.classList.add('show');
-      setTimeout(() => { f.classList.remove('show'); f.style.maxWidth=''; }, 4000);
+      setTimeout(() => { f.classList.remove('show'); f.style.maxWidth = ''; }, 4000);
       showWaitingPanel();
     });
   } else {
@@ -1774,12 +1653,11 @@ function payManualUpi() {
   }
 }
 
-/* ── Copy UPI ID ─────────────────────────────────────── */
+/* ── Copy UPI ID ── */
 function copyUpiId() {
   if (navigator.clipboard) {
     navigator.clipboard.writeText(UPI_ID).then(showCopyFlash).catch(showCopyFlash);
   } else {
-    // fallback
     const el = document.createElement('textarea');
     el.value = UPI_ID; document.body.appendChild(el);
     el.select(); document.execCommand('copy');
@@ -1794,19 +1672,17 @@ function showCopyFlash() {
   setTimeout(() => f.classList.remove('show'), 2200);
 }
 
-/* ── Tab switching ───────────────────────────────────── */
+/* ── Tab switching ── */
 function switchPmTab(tab, btn) {
-  // Hide waiting, show tab bar + panels
   document.getElementById('pmWaiting').classList.remove('active');
   document.getElementById('pmTabBar').style.display = '';
-
   document.querySelectorAll('.pm-tab').forEach(b => b.classList.remove('active'));
   document.querySelectorAll('.pm-panel').forEach(p => p.classList.remove('active'));
   btn.classList.add('active');
   document.getElementById('panel' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add('active');
 }
 
-/* ── Show waiting panel (after any payment triggered) ── */
+/* ── Show waiting panel ── */
 function showWaitingPanel() {
   document.querySelectorAll('.pm-panel').forEach(p => p.classList.remove('active'));
   document.getElementById('pmTabBar').style.display = 'none';
@@ -1817,7 +1693,6 @@ function showWaitingPanel() {
 //  CARD VALIDATION
 // ═══════════════════════════════════════════════════════════════════
 
-/* Luhn algorithm */
 function luhn(num) {
   let n = num.replace(/\s/g, '');
   let sum = 0, alt = false;
@@ -1829,7 +1704,6 @@ function luhn(num) {
   return sum % 10 === 0;
 }
 
-/* Detect card type from number prefix */
 function detectCardType(num) {
   const n = num.replace(/\s/g, '');
   if (/^4/.test(n)) return 'visa';
@@ -1841,11 +1715,9 @@ function detectCardType(num) {
   return null;
 }
 
-/* Format card number with spaces */
 function onCardNumInput(el) {
   let v = el.value.replace(/\D/g, '');
   let type = detectCardType(v);
-  // Amex is 4-6-5, others 4-4-4-4
   if (type === 'amex') {
     v = v.slice(0,15);
     v = v.replace(/(\d{4})(\d{1,6})?(\d{1,5})?/, (_, a, b, c) => [a, b, c].filter(Boolean).join(' '));
@@ -1854,8 +1726,6 @@ function onCardNumInput(el) {
     v = v.replace(/(.{4})/g, '$1 ').trim();
   }
   el.value = v;
-
-  // Live card preview
   const raw = el.value.replace(/\s/g, '');
   let display = '•••• •••• •••• ••••';
   if (raw.length > 0) {
@@ -1893,7 +1763,6 @@ function onCvvInput(el) {
   el.value = el.value.replace(/\D/g, '').slice(0, 4);
 }
 
-/* Individual field validators */
 function validateCardNum() {
   const el  = document.getElementById('cfCardNum');
   const raw = el.value.replace(/\s/g, '');
@@ -1941,7 +1810,6 @@ function validateCvv() {
   return ok;
 }
 
-/* Submit card payment */
 function submitCardPayment() {
   const v1 = validateCardNum();
   const v2 = validateName();
@@ -1952,28 +1820,23 @@ function submitCardPayment() {
   const btn = document.getElementById('cardPayBtn');
   btn.disabled = true;
   btn.innerHTML = '<span class="pm-waiting-spinner" style="width:18px;height:18px;border-width:2px;margin:0;"></span> Processing…';
-
-  // Simulate processing delay → then show waiting panel
-  // (Admin confirms payment from their panel as usual)
   setTimeout(showWaitingPanel, 2200);
 }
 
 // ═══════════════════════════════════════════════════════════════════
-//  OPEN PAYMENT MODAL  — called from app.js after order is placed
+//  OPEN PAYMENT MODAL
 // ═══════════════════════════════════════════════════════════════════
 function showPaymentQR(orderId, totalAmount) {
   _currentOrderId = orderId;
   _currentAmount  = parseFloat(totalAmount);
   const amtStr    = '₹' + _currentAmount.toFixed(2);
 
-  // Set amounts everywhere
   document.getElementById('pmAmount').textContent      = amtStr;
   document.getElementById('pmAmountSmall').textContent = amtStr;
   document.getElementById('pmOrderRef').textContent    = 'Order #' + orderId;
   document.getElementById('pmUpiId').textContent       = UPI_ID;
   document.getElementById('cardBtnAmt').textContent    = amtStr;
 
-  // Reset to QR tab
   switchPmTab('qr', document.querySelector('.pm-tab'));
   document.querySelectorAll('.pm-tab').forEach(b => b.classList.remove('active'));
   document.querySelector('.pm-tab').classList.add('active');
@@ -1982,33 +1845,30 @@ function showPaymentQR(orderId, totalAmount) {
   document.getElementById('pmTabBar').style.display = '';
   document.getElementById('pmWaiting').classList.remove('active');
 
-  // Reset card form
   ['cfCardNum','cfName','cfExpiry','cfCvv'].forEach(id => {
     const el = document.getElementById(id);
     el.value = ''; el.classList.remove('cf-error','cf-valid');
   });
   document.querySelectorAll('.cf-err-msg').forEach(e => e.classList.remove('show'));
-  document.getElementById('cardNumDisplay').textContent = '•••• •••• •••• ••••';
+  document.getElementById('cardNumDisplay').textContent   = '•••• •••• •••• ••••';
   document.getElementById('cardHolderDisplay').textContent = 'FULL NAME';
   document.getElementById('cardExpiryDisplay').textContent = 'MM/YY';
-  document.getElementById('cardTypeBadge').textContent = 'CARD';
+  document.getElementById('cardTypeBadge').textContent    = 'CARD';
   highlightCardType(null);
+
   const cardBtn = document.getElementById('cardPayBtn');
   cardBtn.disabled = false;
   cardBtn.innerHTML = '🔒 Pay ' + amtStr + ' Securely';
 
-  // Reset manual UPI
   document.getElementById('manualUpiInput').value = '';
   document.getElementById('upiManualErr').style.display = 'none';
 
-  // Open modal
   document.getElementById('paymentModal').classList.add('open');
 
-  // Start polling for admin confirmation (same as before)
   if (paymentCheckTimer) clearInterval(paymentCheckTimer);
   paymentCheckTimer = setInterval(async () => {
     try {
-      const res  = await fetch(`php/check_status.php?order_id=${orderId}`);
+      const res  = await fetch('php/check_status.php?order_id=' + orderId);
       const data = await res.json();
       if (data.status === 'paid') {
         clearInterval(paymentCheckTimer);
@@ -2022,11 +1882,10 @@ function showPaymentQR(orderId, totalAmount) {
 }
 
 // ═══════════════════════════════════════════════════════════════════
-//  SUCCESS FLOW — unchanged, admin marks paid → triggers this
+//  SUCCESS FLOW
 // ═══════════════════════════════════════════════════════════════════
 function handlePaymentConfirmed() {
   document.getElementById('paymentModal').classList.remove('open');
-
   showSuccessPopup(
     '✅', 'Payment Confirmed!',
     'Your payment has been received successfully.',
@@ -2049,12 +1908,12 @@ function showSuccessPopup(icon, title, message, onClose, autoCloseMs) {
   const overlay = document.createElement('div');
   overlay.id        = 'dynamicSuccessOverlay';
   overlay.className = 'success-overlay';
-  overlay.innerHTML = `
-    <div class="success-box">
-      <span class="sb-icon">${icon}</span>
-      <h2>${title}</h2>
-      <p>${message}</p>
-    </div>`;
+  overlay.innerHTML =
+    '<div class="success-box">' +
+      '<span class="sb-icon">' + icon + '</span>' +
+      '<h2>' + title + '</h2>' +
+      '<p>' + message + '</p>' +
+    '</div>';
   document.body.appendChild(overlay);
 
   setTimeout(() => {
@@ -2071,30 +1930,25 @@ function showSuccessPopup(icon, title, message, onClose, autoCloseMs) {
 <script>
 // ═══════════════════════════════════════════════════════════════════
 //  LIVE ORDER STATUS TRACKER
-//  Shows a floating widget after order placement.
-//  Polls php/check_status.php every 4 seconds for status updates.
-//  Updates the step indicators without any page refresh.
 // ═══════════════════════════════════════════════════════════════════
 
-let _trackerOrderId   = null;
-let _trackerTimer     = null;
+let _trackerOrderId    = null;
+let _trackerTimer      = null;
 let _trackerLastStatus = null;
 
 const STATUS_STEPS = {
-  pending   : { step: 1, text: 'Order received — kitchen will start soon ⏳'   },
-  preparing : { step: 2, text: 'Chefs are cooking your food! 👨‍🍳'               },
-  served    : { step: 3, text: 'Your food is on the way — enjoy your meal! 🎉'  },
-  cancelled : { step: 0, text: 'Order was cancelled. Please contact staff.'      },
+  pending   : { step: 1, text: 'Order received — kitchen will start soon ⏳' },
+  preparing : { step: 2, text: 'Chefs are cooking your food! 👨‍🍳'            },
+  served    : { step: 3, text: 'Your food is on the way — enjoy your meal! 🎉' },
+  cancelled : { step: 0, text: 'Order was cancelled. Please contact staff.'    },
 };
 
-/* ── Show tracker widget ── */
 function showOrderTracker(orderId) {
   _trackerOrderId    = orderId;
   _trackerLastStatus = null;
 
   document.getElementById('otOrderNum').textContent = 'Order #' + orderId;
 
-  // Reset all steps to neutral
   ['pending','preparing','served'].forEach(s => {
     document.getElementById('otStep-' + s).className = 'ot-step';
   });
@@ -2105,21 +1959,16 @@ function showOrderTracker(orderId) {
   statusEl.className   = 'ot-status-text';
   statusEl.textContent = 'Waiting for kitchen…';
 
-  document.getElementById('otLiveDot').className   = 'ot-live-dot';
+  document.getElementById('otLiveDot').className    = 'ot-live-dot';
   document.getElementById('otLiveLabel').textContent = 'Updating live';
 
-  // Show widget
   document.getElementById('orderTracker').classList.add('visible');
-
-  // Apply pending state immediately
   applyTrackerStatus('pending');
 
-  // Start polling
   if (_trackerTimer) clearInterval(_trackerTimer);
   _trackerTimer = setInterval(pollOrderStatus, 4000);
 }
 
-/* ── Hide / dismiss tracker ── */
 function closeOrderTracker() {
   document.getElementById('orderTracker').classList.remove('visible');
   stopTrackerPolling();
@@ -2129,11 +1978,10 @@ function stopTrackerPolling() {
   if (_trackerTimer) { clearInterval(_trackerTimer); _trackerTimer = null; }
   const dot   = document.getElementById('otLiveDot');
   const label = document.getElementById('otLiveLabel');
-  if (dot)   dot.className   = 'ot-live-dot stopped';
+  if (dot)   dot.className    = 'ot-live-dot stopped';
   if (label) label.textContent = 'Updates stopped';
 }
 
-/* ── Poll check_status.php ── */
 async function pollOrderStatus() {
   if (!_trackerOrderId) return;
   try {
@@ -2141,9 +1989,8 @@ async function pollOrderStatus() {
     const data = await res.json();
     if (!data.success) return;
 
-    const status = data.status;  // pending|preparing|served|cancelled
+    const status = data.status;
 
-    // ── Payment confirmed? (legacy flow still works) ──
     if (data.payment === 'paid' && typeof handlePaymentConfirmed === 'function') {
       const payModal = document.getElementById('paymentModal');
       if (payModal && payModal.classList.contains('open')) {
@@ -2152,78 +1999,63 @@ async function pollOrderStatus() {
       }
     }
 
-    // ── Order status changed? ──
     if (status && status !== _trackerLastStatus) {
       _trackerLastStatus = status;
       applyTrackerStatus(status);
-
-      // Stop polling when order is done
       if (status === 'served' || status === 'cancelled') {
-        setTimeout(stopTrackerPolling, 5000); // keep widget visible 5s
+        setTimeout(stopTrackerPolling, 5000);
       }
     }
-  } catch (e) {
-    // Network hiccup — keep polling silently
-  }
+  } catch (e) {}
 }
 
-/* ── Update step UI ── */
 function applyTrackerStatus(status) {
   const info = STATUS_STEPS[status] || STATUS_STEPS.pending;
   const step = info.step;
 
-  // Step states: done = completed, active = current
   const steps = [
     { key: 'pending',   num: 1 },
     { key: 'preparing', num: 2 },
     { key: 'served',    num: 3 },
   ];
 
-  steps.forEach(({ key, num }) => {
-    const el = document.getElementById('otStep-' + key);
+  steps.forEach(function(s) {
+    const el = document.getElementById('otStep-' + s.key);
     if (!el) return;
     if (status === 'cancelled') {
       el.className = 'ot-step';
-    } else if (num < step) {
+    } else if (s.num < step) {
       el.className = 'ot-step done';
-    } else if (num === step) {
+    } else if (s.num === step) {
       el.className = 'ot-step active';
     } else {
       el.className = 'ot-step';
     }
   });
 
-  // Connector lines
   if (status !== 'cancelled') {
     document.getElementById('otLine-1').classList.toggle('filled', step >= 2);
     document.getElementById('otLine-2').classList.toggle('filled', step >= 3);
   }
 
-  // Status text
   const textEl = document.getElementById('otStatusText');
   textEl.textContent = info.text;
-  textEl.className   = 'ot-status-text' + (status === 'served' ? ' served' : status === 'cancelled' ? ' cancelled' : '');
+  textEl.className   = 'ot-status-text' +
+    (status === 'served' ? ' served' : status === 'cancelled' ? ' cancelled' : '');
 }
 
-// ═══════════════════════════════════════════════════════════════════
-//  HOOK INTO handlePaymentConfirmed — launch tracker after payment
-// ═══════════════════════════════════════════════════════════════════
+// Hook: show tracker after payment confirmed
 const _origHandlePaymentConfirmed = typeof handlePaymentConfirmed === 'function'
   ? handlePaymentConfirmed : null;
 
-// Override to also start the tracker
 window.handlePaymentConfirmed = function () {
   if (_origHandlePaymentConfirmed) _origHandlePaymentConfirmed();
-
-  // Show tracker after the success popups (delay 4s)
   if (_currentOrderId) {
     setTimeout(() => showOrderTracker(_currentOrderId), 4200);
   }
 };
 
-// Also expose for external calls from app.js if it uses showPaymentQR
 const _origShowPaymentQR = typeof showPaymentQR === 'function' ? showPaymentQR : null;
-window._trackerOrderIdFromQR = null;
 if (_origShowPaymentQR) {
   window.showPaymentQR = function(orderId, totalAmount) {
     window._trackerOrderIdFromQR = orderId;
@@ -2247,10 +2079,116 @@ function closeMobileNav() {
   document.getElementById('navMobileOverlay').classList.remove('open');
   document.getElementById('navHamburger').textContent = '☰';
 }
-// Close nav when a link is tapped
 document.querySelectorAll('.nav-links a').forEach(function(el) {
   el.addEventListener('click', closeMobileNav);
 });
+</script>
+
+<script>
+/*
+  UPDATED STATUS_STEPS — includes cancel_reason support
+  Replace the STATUS_STEPS constant and applyTrackerStatus()
+  function in the existing LIVE ORDER STATUS TRACKER block.
+*/
+ 
+// ── UPDATED STATUS_STEPS ──
+const STATUS_STEPS = {
+  pending   : { step: 1, text: 'Order received — kitchen will start soon ⏳' },
+  preparing : { step: 2, text: 'Chefs are cooking your food! 👨‍🍳'            },
+  served    : { step: 3, text: 'Your food is on the way — enjoy your meal! 🎉' },
+  cancelled : { step: 0, text: 'Order was cancelled.'                         },
+};
+ 
+// ── UPDATED applyTrackerStatus — shows cancel reason + refund info ──
+function applyTrackerStatus(status, extraData) {
+  extraData = extraData || {};
+  const info = STATUS_STEPS[status] || STATUS_STEPS.pending;
+  const step = info.step;
+ 
+  const steps = [
+    { key: 'pending',   num: 1 },
+    { key: 'preparing', num: 2 },
+    { key: 'served',    num: 3 },
+  ];
+ 
+  steps.forEach(function(s) {
+    const el = document.getElementById('otStep-' + s.key);
+    if (!el) return;
+    if (status === 'cancelled') {
+      el.className = 'ot-step';
+    } else if (s.num < step) {
+      el.className = 'ot-step done';
+    } else if (s.num === step) {
+      el.className = 'ot-step active';
+    } else {
+      el.className = 'ot-step';
+    }
+  });
+ 
+  if (status !== 'cancelled') {
+    const l1 = document.getElementById('otLine-1');
+    const l2 = document.getElementById('otLine-2');
+    if (l1) l1.classList.toggle('filled', step >= 2);
+    if (l2) l2.classList.toggle('filled', step >= 3);
+  }
+ 
+  const textEl = document.getElementById('otStatusText');
+ 
+  if (status === 'cancelled') {
+    let cancelMsg = '❌ Order Cancelled';
+    if (extraData.cancel_reason) {
+      cancelMsg += '<br><small style="font-size:.78rem;color:#C8460A;font-weight:600;">Reason: ' + escHtmlOT(extraData.cancel_reason) + '</small>';
+    }
+    if (extraData.refund_needed && extraData.refund_amount > 0) {
+      cancelMsg +=
+        '<br><div style="background:#FFF3CD;border:1px solid #FFE69C;border-radius:8px;padding:.5rem .7rem;margin-top:.5rem;font-size:.76rem;color:#856404;line-height:1.5;">' +
+        '🔄 <strong>Refund ₹' + parseFloat(extraData.refund_amount).toFixed(2) + '</strong> will be processed<br>' +
+        'to your original payment within <strong>5–7 business days</strong>.' +
+        '</div>';
+    }
+    textEl.innerHTML = cancelMsg;
+    textEl.className = 'ot-status-text cancelled';
+  } else {
+    textEl.textContent = info.text;
+    textEl.className   = 'ot-status-text' + (status === 'served' ? ' served' : '');
+  }
+}
+ 
+function escHtmlOT(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+ 
+// ── UPDATED pollOrderStatus — passes extra data to applyTrackerStatus ──
+async function pollOrderStatus() {
+  if (!_trackerOrderId) return;
+  try {
+    const res  = await fetch('php/check_status.php?order_id=' + _trackerOrderId + '&_t=' + Date.now());
+    const data = await res.json();
+    if (!data.success) return;
+ 
+    const status = data.status;
+ 
+    if (data.payment === 'paid' && typeof handlePaymentConfirmed === 'function') {
+      const payModal = document.getElementById('paymentModal');
+      if (payModal && payModal.classList.contains('open')) {
+        if (paymentCheckTimer) { clearInterval(paymentCheckTimer); paymentCheckTimer = null; }
+        handlePaymentConfirmed();
+      }
+    }
+ 
+    if (status && status !== _trackerLastStatus) {
+      _trackerLastStatus = status;
+      applyTrackerStatus(status, {
+        cancel_reason  : data.cancel_reason,
+        refund_needed  : data.refund_needed,
+        refund_amount  : data.refund_amount,
+      });
+      if (status === 'served' || status === 'cancelled') {
+        setTimeout(stopTrackerPolling, 8000);
+      }
+    }
+  } catch (e) {}
+}
 </script>
 
 </body>

@@ -121,3 +121,34 @@ async function logout() {
   await fetch('php/auth.php?action=logout');
   window.location.href = 'admin_login.php';
 }
+
+
+async function cancelOrder(orderId) {
+
+    const reason = prompt("Enter cancellation reason:");
+
+    if (!reason) {
+        alert("Cancellation reason required");
+        return;
+    }
+
+    const res = await fetch('php/cancel_order.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            order_id: orderId,
+            reason: reason
+        })
+    });
+
+    const data = await res.json();
+
+    if (data.success) {
+        alert("Order cancelled");
+        location.reload();
+    } else {
+        alert(data.message);
+    }
+}
