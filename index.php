@@ -1066,6 +1066,39 @@ body { overflow-x: hidden; max-width: 100vw; }
         <label>Phone Number</label>
         <input type="tel" id="custPhone" placeholder="Enter phone number">
       </div>
+      <!-- Add this inside your order form, after phone input -->
+<div id="creditNotice" style="display:none; background:#F0FFF4; border:2px solid #86efac;
+     border-radius:12px; padding:1rem 1.2rem; margin:0.8rem 0; font-family:'DM Sans',sans-serif;">
+  <div style="font-weight:700; color:#15803d; font-size:0.95rem; margin-bottom:0.3rem;">
+    🎉 You have store credit!
+  </div>
+  <div style="font-size:0.85rem; color:#166534;">
+    <strong id="creditBalanceAmt">₹0</strong> from a previously cancelled order
+    will be applied to your next order automatically.
+  </div>
+</div>
+
+<script>
+// After phone input loses focus, check credit balance
+document.getElementById('customerPhone').addEventListener('blur', async function() {
+  const phone = this.value.trim();
+  if (!phone || phone.length < 10) return;
+  
+  const res  = await fetch('php/get_credit.php?phone=' + encodeURIComponent(phone));
+  const data = await res.json();
+  
+  window._creditBalance = data.balance || 0;
+  window._creditPhone   = phone;
+  
+  if (window._creditBalance > 0) {
+    document.getElementById('creditNotice').style.display = 'block';
+    document.getElementById('creditBalanceAmt').textContent = 
+      '₹' + parseFloat(window._creditBalance).toFixed(2);
+  }
+});
+</script>
+
+
       <div class="form-group">
         <label>Table Number</label>
         <input type="number" id="tableNo" placeholder="e.g. 5" min="1" max="50">
@@ -1826,59 +1859,90 @@ function submitCardPayment() {
 // ═══════════════════════════════════════════════════════════════════
 //  OPEN PAYMENT MODAL
 // ═══════════════════════════════════════════════════════════════════
-function showPaymentQR(orderId, totalAmount) {
-  _currentOrderId = orderId;
-  _currentAmount  = parseFloat(totalAmount);
-  const amtStr    = '₹' + _currentAmount.toFixed(2);
+// function showPaymentQR(orderId, totalAmount) {
+//   _currentOrderId = orderId;
+//   _currentAmount  = parseFloat(totalAmount);
+//   const amtStr    = '₹' + _currentAmount.toFixed(2);
 
-  document.getElementById('pmAmount').textContent      = amtStr;
-  document.getElementById('pmAmountSmall').textContent = amtStr;
-  document.getElementById('pmOrderRef').textContent    = 'Order #' + orderId;
-  document.getElementById('pmUpiId').textContent       = UPI_ID;
-  document.getElementById('cardBtnAmt').textContent    = amtStr;
+//   document.getElementById('pmAmount').textContent      = amtStr;
+//   document.getElementById('pmAmountSmall').textContent = amtStr;
+//   document.getElementById('pmOrderRef').textContent    = 'Order #' + orderId;
+//   document.getElementById('pmUpiId').textContent       = UPI_ID;
+//   document.getElementById('cardBtnAmt').textContent    = amtStr;
 
-  switchPmTab('qr', document.querySelector('.pm-tab'));
-  document.querySelectorAll('.pm-tab').forEach(b => b.classList.remove('active'));
-  document.querySelector('.pm-tab').classList.add('active');
-  document.querySelectorAll('.pm-panel').forEach(p => p.classList.remove('active'));
-  document.getElementById('panelQr').classList.add('active');
-  document.getElementById('pmTabBar').style.display = '';
-  document.getElementById('pmWaiting').classList.remove('active');
+//   switchPmTab('qr', document.querySelector('.pm-tab'));
+//   document.querySelectorAll('.pm-tab').forEach(b => b.classList.remove('active'));
+//   document.querySelector('.pm-tab').classList.add('active');
+//   document.querySelectorAll('.pm-panel').forEach(p => p.classList.remove('active'));
+//   document.getElementById('panelQr').classList.add('active');
+//   document.getElementById('pmTabBar').style.display = '';
+//   document.getElementById('pmWaiting').classList.remove('active');
 
-  ['cfCardNum','cfName','cfExpiry','cfCvv'].forEach(id => {
-    const el = document.getElementById(id);
-    el.value = ''; el.classList.remove('cf-error','cf-valid');
-  });
-  document.querySelectorAll('.cf-err-msg').forEach(e => e.classList.remove('show'));
-  document.getElementById('cardNumDisplay').textContent   = '•••• •••• •••• ••••';
-  document.getElementById('cardHolderDisplay').textContent = 'FULL NAME';
-  document.getElementById('cardExpiryDisplay').textContent = 'MM/YY';
-  document.getElementById('cardTypeBadge').textContent    = 'CARD';
-  highlightCardType(null);
+//   ['cfCardNum','cfName','cfExpiry','cfCvv'].forEach(id => {
+//     const el = document.getElementById(id);
+//     el.value = ''; el.classList.remove('cf-error','cf-valid');
+//   });
+//   document.querySelectorAll('.cf-err-msg').forEach(e => e.classList.remove('show'));
+//   document.getElementById('cardNumDisplay').textContent   = '•••• •••• •••• ••••';
+//   document.getElementById('cardHolderDisplay').textContent = 'FULL NAME';
+//   document.getElementById('cardExpiryDisplay').textContent = 'MM/YY';
+//   document.getElementById('cardTypeBadge').textContent    = 'CARD';
+//   highlightCardType(null);
 
-  const cardBtn = document.getElementById('cardPayBtn');
-  cardBtn.disabled = false;
-  cardBtn.innerHTML = '🔒 Pay ' + amtStr + ' Securely';
+//   const cardBtn = document.getElementById('cardPayBtn');
+//   cardBtn.disabled = false;
+//   cardBtn.innerHTML = '🔒 Pay ' + amtStr + ' Securely';
 
-  document.getElementById('manualUpiInput').value = '';
-  document.getElementById('upiManualErr').style.display = 'none';
+//   document.getElementById('manualUpiInput').value = '';
+//   document.getElementById('upiManualErr').style.display = 'none';
 
-  document.getElementById('paymentModal').classList.add('open');
+//   document.getElementById('paymentModal').classList.add('open');
 
-  if (paymentCheckTimer) clearInterval(paymentCheckTimer);
-  paymentCheckTimer = setInterval(async () => {
-    try {
-      const res  = await fetch('php/check_status.php?order_id=' + orderId);
-      const data = await res.json();
-      if (data.status === 'paid') {
-        clearInterval(paymentCheckTimer);
-        paymentCheckTimer = null;
-        handlePaymentConfirmed();
-      }
-    } catch (err) {
-      console.log('Polling…', err);
-    }
-  }, 3000);
+//   if (paymentCheckTimer) clearInterval(paymentCheckTimer);
+//   paymentCheckTimer = setInterval(async () => {
+//     try {
+//       const res  = await fetch('php/check_status.php?order_id=' + orderId);
+//       const data = await res.json();
+//       if (data.status === 'paid') {
+//         clearInterval(paymentCheckTimer);
+//         paymentCheckTimer = null;
+//         handlePaymentConfirmed();
+//       }
+//     } catch (err) {
+//       console.log('Polling…', err);
+//     }
+//   }, 3000);
+// }
+
+
+function showPaymentWithCredit(orderId, originalTotal, phone) {
+  const credit    = window._creditBalance || 0;
+  const applied   = Math.min(credit, originalTotal);  // can't apply more than total
+  const toPay     = Math.max(0, originalTotal - applied);
+  
+  window._currentOrderId    = orderId;
+  window._creditApplied     = applied;
+  window._creditSource      = window._lastCancelledOrderId || 0;
+  window._amountToPay       = toPay;
+  window._originalTotal     = originalTotal;
+
+  // Apply credit to order in DB
+  if (applied > 0) {
+    const form = new FormData();
+    form.append('order_id',      orderId);
+    form.append('phone',         phone);
+    form.append('credit_used',   applied);
+    form.append('credit_source', window._creditSource);
+    fetch('php/apply_credit.php', { method: 'POST', body: form });
+  }
+
+  if (toPay <= 0) {
+    // Fully covered by credit — no payment needed!
+    showFullyCoveredModal(orderId, originalTotal, applied);
+  } else {
+    // Show payment modal with breakdown
+    showPaymentBreakdown(orderId, originalTotal, applied, toPay);
+  }
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -2191,5 +2255,318 @@ async function pollOrderStatus() {
 }
 </script>
 
+<!-- ══════════════════════════════════════════
+     PAYMENT CONFIRMED POPUP
+══════════════════════════════════════════ -->
+<style>
+.pay-confirmed-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.65);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 999999;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.3s;
+  padding: 1rem;
+}
+.pay-confirmed-overlay.open {
+  opacity: 1; pointer-events: all;
+}
+.pay-confirmed-box {
+  background: #fff;
+  border-radius: 24px;
+  padding: 2.5rem 2rem;
+  max-width: 380px; width: 100%;
+  text-align: center;
+  box-shadow: 0 30px 80px rgba(0,0,0,0.4);
+  transform: scale(0.85) translateY(20px);
+  transition: transform 0.45s cubic-bezier(0.34,1.56,0.64,1);
+  font-family: 'DM Sans', sans-serif;
+}
+.pay-confirmed-overlay.open .pay-confirmed-box {
+  transform: scale(1) translateY(0);
+}
+.pay-confirmed-icon {
+  font-size: 4.5rem;
+  display: block;
+  margin-bottom: 0.8rem;
+  animation: pcPop 0.5s cubic-bezier(0.34,1.56,0.64,1);
+}
+@keyframes pcPop {
+  from { transform: scale(0) rotate(-15deg); }
+  to   { transform: scale(1) rotate(0deg);   }
+}
+.pay-confirmed-box h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.7rem; font-weight: 900;
+  color: #1A0F0A; margin-bottom: 0.5rem;
+}
+.pay-confirmed-box p {
+  color: #8B6355; font-size: 0.92rem;
+  line-height: 1.7; margin-bottom: 1.4rem;
+}
+.pay-confirmed-badge {
+  background: #F0FFF4;
+  border: 2px solid #86efac;
+  border-radius: 14px;
+  padding: 0.8rem 1.2rem;
+  font-size: 1rem;
+  color: #15803d;
+  font-weight: 700;
+  margin-bottom: 1.6rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+.pay-confirmed-btn {
+  background: #C8460A; color: #fff;
+  border: none; border-radius: 50px;
+  padding: 0.9rem 2.5rem;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 1rem; font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+  width: 100%;
+}
+.pay-confirmed-btn:hover {
+  background: #E85D1E;
+  transform: translateY(-1px);
+}
+</style>
+
+<div class="pay-confirmed-overlay" id="payConfirmedOverlay">
+  <div class="pay-confirmed-box">
+    <span class="pay-confirmed-icon">🎉</span>
+    <h2>Payment Confirmed!</h2>
+    <p>Your payment has been received and your order is now placed. Our kitchen is getting started!</p>
+    <div class="pay-confirmed-badge">
+      <span>✅</span>
+      <span id="payConfirmedOrderNum">Order #—</span>
+    </div>
+    <button class="pay-confirmed-btn" onclick="closePayConfirmedPopup()">
+      Track My Order →
+    </button>
+  </div>
+</div>
+
+<script>
+(function () {
+  // ─── State ───────────────────────────────────────────────
+  var _pollTimer   = null;
+  var _pollOrderId = null;
+  var _pollDone    = false;
+
+  // ─── Start polling ────────────────────────────────────────
+  function startPoll(orderId) {
+    if (!orderId) return;
+    _pollOrderId = orderId;
+    _pollDone    = false;
+    if (_pollTimer) clearInterval(_pollTimer);
+    _pollTimer = setInterval(doPoll, 3000);
+    console.log('[PayPoll] Started for order #' + orderId);
+  }
+
+  function stopPoll() {
+    if (_pollTimer) { clearInterval(_pollTimer); _pollTimer = null; }
+  }
+
+  // ─── Poll check_status.php ────────────────────────────────
+  async function doPoll() {
+    if (!_pollOrderId || _pollDone) return;
+    try {
+      var res  = await fetch('php/check_status.php?order_id=' + _pollOrderId + '&_t=' + Date.now());
+      var data = await res.json();
+
+      console.log('[PayPoll] Response:', data);
+
+      if (data.success && data.payment === 'paid') {
+        _pollDone = true;
+        stopPoll();
+        onPaymentConfirmed(_pollOrderId);
+      }
+    } catch (e) {
+      console.warn('[PayPoll] Error:', e);
+    }
+  }
+
+  // ─── On confirmed ─────────────────────────────────────────
+  function onPaymentConfirmed(orderId) {
+    // 1. Close payment modal if open
+    var payModal = document.getElementById('paymentModal');
+    if (payModal) payModal.classList.remove('open');
+
+    // 2. Show popup
+    document.getElementById('payConfirmedOrderNum').textContent = 'Order #' + orderId + ' Confirmed';
+    document.getElementById('payConfirmedOverlay').classList.add('open');
+
+    // 3. Start order tracker after popup is closed (or after 4s auto)
+    window._confirmedOrderId = orderId;
+  }
+
+  // ─── Close popup ─────────────────────────────────────────
+  window.closePayConfirmedPopup = function () {
+    document.getElementById('payConfirmedOverlay').classList.remove('open');
+    if (window._confirmedOrderId && typeof showOrderTracker === 'function') {
+      showOrderTracker(window._confirmedOrderId);
+    }
+  };
+
+  // ─── Hook into showPaymentQR ──────────────────────────────
+  // This function is called by app.js when the QR/payment modal opens
+  // It receives the orderId — we intercept it here
+  function hookShowPaymentQR() {
+    var original = window.showPaymentQR;
+    if (typeof original === 'function') {
+     showPaymentWithCredit(
+  orderId, 
+  totalAmount, 
+  document.getElementById('customerPhone').value
+);
+      console.log('[PayPoll] Hooked into showPaymentQR');
+      return true;
+    }
+    return false;
+  }
+
+  // ─── Also hook into order placement directly ──────────────
+  // In case showPaymentQR isn't called, watch for _currentOrderId being set
+  function hookCurrentOrderId() {
+    var original = window.showPaymentQR;
+    // Watch paymentModal opening as fallback
+    var modal = document.getElementById('paymentModal');
+    if (modal) {
+      new MutationObserver(function () {
+        if (modal.classList.contains('open')) {
+          // Try every known variable name app.js might use
+          var oid = window._currentOrderId
+                 || window.currentOrderId
+                 || window._lastOrderId
+                 || window._trackerOrderIdFromQR
+                 || window._trackerOrderId;
+          if (oid && oid !== _pollOrderId) {
+            startPoll(oid);
+          }
+        }
+      }).observe(modal, { attributes: true, attributeFilter: ['class'] });
+    }
+  }
+
+  // ─── Init: wait for app.js to load then hook ─────────────
+  function init() {
+    if (!hookShowPaymentQR()) {
+      // app.js not ready yet, retry
+      setTimeout(init, 200);
+      return;
+    }
+    hookCurrentOrderId(); // fallback watcher
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+
+})();
+
+// Case 1: Credit fully covers the order
+function showFullyCoveredModal(orderId, original, applied) {
+  const html = `
+    <div style="text-align:center; padding:2rem; font-family:'DM Sans',sans-serif;">
+      <div style="font-size:3.5rem; margin-bottom:1rem;">🎉</div>
+      <h2 style="font-family:'Playfair Display',serif; color:#1A0F0A; margin-bottom:0.5rem;">
+        Order Placed Free!
+      </h2>
+      <p style="color:#8B6355; margin-bottom:1.5rem;">
+        Your store credit fully covered this order.
+      </p>
+      
+      <div style="background:#f9f9f9; border-radius:12px; padding:1rem 1.2rem; 
+                  margin-bottom:1.2rem; text-align:left; font-size:0.88rem;">
+        <div style="display:flex; justify-content:space-between; margin-bottom:0.5rem;">
+          <span style="color:#666;">Order Total</span>
+          <span>₹${parseFloat(original).toFixed(2)}</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; margin-bottom:0.5rem; color:#15803d; font-weight:600;">
+          <span>🎁 Credit Applied</span>
+          <span>− ₹${parseFloat(applied).toFixed(2)}</span>
+        </div>
+        <div style="border-top:1px solid #eee; margin:0.5rem 0;"></div>
+        <div style="display:flex; justify-content:space-between; font-weight:700; font-size:1rem;">
+          <span>You Pay</span>
+          <span style="color:#15803d;">₹0.00 ✅</span>
+        </div>
+      </div>
+      
+      <button onclick="document.getElementById('paymentModal').classList.remove('open');
+                       showOrderTracker(${orderId});"
+        style="background:#C8460A; color:#fff; border:none; border-radius:50px;
+               padding:0.9rem 2rem; font-weight:700; font-size:1rem; 
+               cursor:pointer; width:100%;">
+        Track My Order →
+      </button>
+    </div>
+  `;
+  document.querySelector('.payment-modal').innerHTML = html;
+  document.getElementById('paymentModal').classList.add('open');
+}
+
+// Case 2: Partial credit — show how much to pay
+function showPaymentBreakdown(orderId, original, applied, toPay) {
+  // Show breakdown INSIDE the existing payment modal header
+  const breakdownHtml = `
+    <div style="background:#fff; border-radius:12px; padding:0.9rem 1.1rem;
+                margin:0.8rem 1.6rem; font-size:0.85rem; border:1.5px solid #e0e0e0;">
+      <div style="display:flex; justify-content:space-between; margin-bottom:0.4rem;">
+        <span style="color:#666;">Previous Cancelled Order</span>
+        <span style="font-weight:600;">₹${parseFloat(original).toFixed(2)}</span>
+      </div>
+      <div style="display:flex; justify-content:space-between; margin-bottom:0.4rem; color:#C8460A;">
+        <span>🎁 Credit from cancelled order</span>
+        <span style="font-weight:600;">− ₹${parseFloat(applied).toFixed(2)}</span>
+      </div>
+      <div style="border-top:1px solid #eee; margin:0.5rem 0;"></div>
+      <div style="display:flex; justify-content:space-between; font-weight:700; font-size:1rem;">
+        <span>Amount to Pay Now</span>
+        <span style="color:#C8460A;">₹${parseFloat(toPay).toFixed(2)}</span>
+      </div>
+    </div>
+  `;
+
+  // Insert breakdown after modal header
+  const header = document.querySelector('.pm-header');
+  if (header) {
+    const div = document.createElement('div');
+    div.id        = 'creditBreakdown';
+    div.innerHTML = breakdownHtml;
+    header.insertAdjacentElement('afterend', div);
+  }
+
+  // Update the amount badge to show reduced amount
+  const badge = document.querySelector('.pm-amount-badge');
+  if (badge) badge.textContent = '₹' + parseFloat(toPay).toFixed(2);
+
+  // NOW show the QR/payment modal with toPay amount
+  // This opens the existing payment modal
+  document.getElementById('paymentModal').classList.add('open');
+  
+  // Update UPI payment links to use toPay amount
+  window._upiAmount = toPay;
+  updateUpiLinks(toPay);
+}
+
+function updateUpiLinks(amount) {
+  // Update all UPI deep links with correct amount
+  document.querySelectorAll('.upi-app-btn').forEach(btn => {
+    const href = btn.getAttribute('href') || '';
+    if (href.includes('upi://')) {
+      // Replace amount in UPI URL
+      btn.setAttribute('href', 
+        href.replace(/am=[\d.]+/, 'am=' + amount.toFixed(2))
+      );
+    }
+  });
+}
+</script>
 </body>
 </html>

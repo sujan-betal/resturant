@@ -36,35 +36,70 @@ async function loadStats() {
 // ===== ORDERS =====
 async function loadOrders() {
   try {
+
     const res = await fetch('php/order.php');
     const orders = await res.json();
+
     const tbody = document.getElementById('ordersBody');
+
     if (!orders.length) {
       tbody.innerHTML = '<tr><td colspan="9" class="loading-row">No orders yet 🍽</td></tr>';
       return;
     }
+
     tbody.innerHTML = orders.map(o => `
       <tr>
         <td><strong>#${o.id}</strong></td>
         <td>${o.customer_name}</td>
         <td>${o.customer_phone || '-'}</td>
         <td>${o.table_number || '-'}</td>
-        <td style="max-width:200px;font-size:0.8rem">${o.items_list || '-'}</td>
+        <td style="max-width:200px;font-size:0.8rem">
+  ${o.items_list || '-'}
+</td>
         <td><strong>₹${parseFloat(o.total_amount).toFixed(2)}</strong></td>
-        <td><span class="status-badge status-${o.status}">${o.status}</span></td>
-        <td style="font-size:0.8rem">${formatDate(o.created_at)}</td>
         <td>
-          <select class="status-select" onchange="updateStatus(${o.id}, this.value)">
-            <option value="pending" ${o.status==='pending'?'selected':''}>Pending</option>
-            <option value="preparing" ${o.status==='preparing'?'selected':''}>Preparing</option>
-            <option value="served" ${o.status==='served'?'selected':''}>Served</option>
-            <option value="cancelled" ${o.status==='cancelled'?'selected':''}>Cancelled</option>
+          <span class="status-badge status-${o.status}">
+            ${o.status}
+          </span>
+        </td>
+        <td style="font-size:0.8rem">
+          ${formatDate(o.created_at)}
+        </td>
+        <td>
+          <select class="status-select"
+            onchange="updateStatus(${o.id}, this.value)">
+            
+            <option value="pending"
+              ${o.status==='pending'?'selected':''}>
+              Pending
+            </option>
+
+            <option value="preparing"
+              ${o.status==='preparing'?'selected':''}>
+              Preparing
+            </option>
+
+            <option value="served"
+              ${o.status==='served'?'selected':''}>
+              Served
+            </option>
+
+            <option value="cancelled"
+              ${o.status==='cancelled'?'selected':''}>
+              Cancelled
+            </option>
+
           </select>
         </td>
       </tr>
     `).join('');
+
   } catch (e) {
-    document.getElementById('ordersBody').innerHTML = '<tr><td colspan="9" class="loading-row">⚠️ Error loading orders</td></tr>';
+
+    console.error(e);
+
+    document.getElementById('ordersBody').innerHTML =
+      '<tr><td colspan="9" class="loading-row">⚠️ Error loading orders</td></tr>';
   }
 }
 

@@ -449,7 +449,7 @@ function showAdminToast(msg, ms) {
 function markPaid(orderId, btn) {
   btn.disabled = true;
   btn.textContent = '⏳ Confirming…';
-  fetch('php/payment.php', {
+  fetch('php/mark_paid.php', {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: 'order_id=' + orderId

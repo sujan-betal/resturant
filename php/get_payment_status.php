@@ -1,16 +1,18 @@
 <?php
-// php/get_payment_status.php
+require 'connect.php';
 
-header('Content-Type: application/json');
+$order_id = intval($_GET['order_id'] ?? 0);
+if (!$order_id) { echo json_encode(['payment' => 'unpaid']); exit; }
 
-require 'connect.php';   // already in php/ folder ✅
+$stmt = $conn->prepare("SELECT is_paid FROM orders WHERE id = ?");
+$stmt->bind_param("i", $order_id);
+$stmt->execute();
+$result = $stmt->get_result();
+$row = $result->fetch_assoc();
+$stmt->close();
 
-$id  = intval($_GET['order_id'] ?? 0);
-$row = $conn->query("SELECT payment FROM orders WHERE id = $id")->fetch_assoc();
-
-echo json_encode([
-    'payment' => $row['payment'] ?? 'pending'
-]);
-
-$conn->close();
-?>
+if ($row && $row['is_paid'] == 1) {
+    echo json_encode(['payment' => 'paid']);
+} else {
+    echo json_encode(['payment' => 'unpaid']);
+}

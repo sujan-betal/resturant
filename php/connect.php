@@ -7,7 +7,7 @@ ini_set('display_errors', 1);
 $host = '127.0.0.1';
 $db   = 'restaurant_db';
 $user = 'root';
-$pass = 'root'; // <-- Put your MySQL password here (leave blank if you don't have one)
+$pass = ''; // <-- Put your MySQL password here (leave blank if you don't have one)
 $port = 3306;
 
 // ==========================================
