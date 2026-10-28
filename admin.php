@@ -4,6 +4,7 @@ if (!isset($_SESSION['admin_logged_in'])) {
     header('Location: admin_login.php');
     exit;
 }
+$demo_mode = !empty($_SESSION['admin_demo']);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -199,9 +200,20 @@ tr.row-unpaid { background:#FFFEF6 !important; }
 .lm-btn-cancel:hover { background:#e5ddd7; }
 .lm-btn-confirm { background:#C8460A; color:white; }
 .lm-btn-confirm:hover { background:#E85D1E; }
+<?php if ($demo_mode): ?>
+.demo-mode .status-select,
+.demo-mode .toggle-btn,
+.demo-mode .btn-mark-paid,
+.demo-mode .btn-cancel-order,
+.demo-mode #cmConfirmBtn { pointer-events:none !important; opacity:.45 !important; cursor:not-allowed !important; }
+.demo-banner { margin:1rem; padding:.85rem 1rem; border:1px solid #d7a36a; border-radius:12px; background:#fff4e5; color:#713b12; font:600 .9rem 'DM Sans',sans-serif; text-align:center; }
+<?php endif; ?>
 </style>
 </head>
-<body>
+<body class="<?= $demo_mode ? 'demo-mode' : '' ?>">
+<?php if ($demo_mode): ?>
+<div class="demo-banner" role="status">Read-only portfolio demo · Sample data only · Changes are not saved</div>
+<?php endif; ?>
 
 <!-- Mobile sidebar toggle -->
 <button class="sidebar-toggle" id="sidebarToggle" onclick="toggleSidebar()">☰</button>
@@ -325,6 +337,7 @@ tr.row-unpaid { background:#FFFEF6 !important; }
   </div>
 </div>
 
+<script>const IS_DEMO_MODE = <?= $demo_mode ? 'true' : 'false' ?>;</script>
 <script src="js/admin.js"></script>
 
 <script>

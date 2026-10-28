@@ -50,6 +50,13 @@ body {
   margin-top: 0.5rem;
 }
 .login-btn:hover { background: #E85D1E; transform: translateY(-1px); }
+.demo-btn {
+  width: 100%; margin-top: 1rem; padding: 0.85rem;
+  border: 1px solid #C8460A; border-radius: 50px;
+  background: #FFF3ED; color: #9D3607; font-weight: 700;
+  font-size: .95rem; cursor: pointer;
+}
+.demo-note { margin-top: .55rem; color: #8B6355; font-size: .75rem; }
 
 .error-msg {
   background: #F8D7DA; color: #721C24;
@@ -99,6 +106,9 @@ body {
     <button type="submit" class="login-btn">Login to Admin Panel</button>
   </form>
 
+  <button type="button" class="demo-btn" id="demoLogin">Explore read-only demo dashboard</button>
+  <p class="demo-note">Sample orders and menu · Changes are disabled</p>
+
   <a href="index.php" class="back-link">← Back to Website</a>
 </div>
 
@@ -119,6 +129,23 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
     window.location.href = 'admin.php';
   } else {
     document.getElementById('errorMsg').classList.add('show');
+  }
+});
+
+document.getElementById('demoLogin').addEventListener('click', async () => {
+  const button = document.getElementById('demoLogin');
+  button.disabled = true;
+  button.textContent = 'Opening demo…';
+  try {
+    const res = await fetch('php/auth.php?action=demo');
+    const data = await res.json();
+    if (!res.ok || !data.success) throw new Error(data.error || 'Could not open demo');
+    window.location.href = 'admin.php';
+  } catch (error) {
+    document.getElementById('errorMsg').textContent = error.message;
+    document.getElementById('errorMsg').classList.add('show');
+    button.disabled = false;
+    button.textContent = 'Explore read-only demo dashboard';
   }
 });
 </script>

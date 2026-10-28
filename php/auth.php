@@ -4,6 +4,16 @@
 session_start();
 header('Content-Type: application/json');
 
+// Portfolio demo access is a separate read-only session; never authenticate it as the restaurant admin.
+if (isset($_GET['action']) && $_GET['action'] === 'demo') {
+    session_regenerate_id(true);
+    $_SESSION['admin_logged_in'] = true;
+    $_SESSION['admin_demo'] = true;
+    $_SESSION['admin_user'] = 'Demo viewer';
+    echo json_encode(['success' => true, 'message' => 'Read-only demo session started']);
+    exit;
+}
+
 // ═══════════════════════════════════════
 //  LOGOUT  →  php/auth.php?action=logout
 // ═══════════════════════════════════════
@@ -34,6 +44,7 @@ define('ADMIN_USERNAME', 'admin');
 define('ADMIN_PASSWORD', 'admin');   // ← change this!
 
 if ($username === ADMIN_USERNAME && $password === ADMIN_PASSWORD) {
+    unset($_SESSION['admin_demo']);
     $_SESSION['admin_logged_in'] = true;
     $_SESSION['admin_user']      = $username;
     echo json_encode(['success' => true, 'message' => 'Login successful']);

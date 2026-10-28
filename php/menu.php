@@ -56,7 +56,7 @@ switch ($action) {
     // admin toggle
     case 'toggle':
         session_start();
-        if (!isset($_SESSION['admin_logged_in'])) {
+        if (!isset($_SESSION['admin_logged_in']) || !empty($_SESSION['admin_demo'])) {
             http_response_code(403);
             echo json_encode(['success' => false, 'error' => 'Unauthorized']);
             exit;

@@ -5,6 +5,21 @@ session_start();
 
 header('Content-Type: application/json');
 
+if (!empty($_SESSION['admin_demo'])) {
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        http_response_code(403);
+        echo json_encode(['success' => false, 'error' => 'Read-only demo']);
+        exit;
+    }
+    echo json_encode([
+        [ 'id' => 2401, 'customer_name' => 'Aarav Mehta', 'customer_phone' => '000-000-0101', 'table_number' => 4, 'total_amount' => '860.00', 'status' => 'preparing', 'created_at' => date('Y-m-d H:i:s', time() - 900), 'items_list' => 'Paneer Tikka x2, Masala Chai x2' ],
+        [ 'id' => 2402, 'customer_name' => 'Mira Shah', 'customer_phone' => '000-000-0102', 'table_number' => 7, 'total_amount' => '1240.00', 'status' => 'pending', 'created_at' => date('Y-m-d H:i:s', time() - 2100), 'items_list' => 'Thali Special x2, Gulab Jamun x2' ],
+        [ 'id' => 2403, 'customer_name' => 'Kabir Rao', 'customer_phone' => '000-000-0103', 'table_number' => 2, 'total_amount' => '540.00', 'status' => 'served', 'created_at' => date('Y-m-d H:i:s', time() - 4200), 'items_list' => 'Butter Naan x2, Dal Makhani x1' ],
+        [ 'id' => 2404, 'customer_name' => 'Anaya Das', 'customer_phone' => '000-000-0104', 'table_number' => 5, 'total_amount' => '720.00', 'status' => 'pending', 'created_at' => date('Y-m-d H:i:s', time() - 6000), 'items_list' => 'Veg Biryani x2, Lassi x2' ],
+    ]);
+    exit;
+}
+
 require_once 'connect.php';
 
 // ======================================================

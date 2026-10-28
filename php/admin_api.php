@@ -13,11 +13,29 @@ if (!isset($_SESSION['admin_logged_in'])) {
     exit;
 }
 
-require_once 'connect.php';
-
 $action = isset($_GET['action'])
     ? $_GET['action']
     : (isset($_POST['action']) ? $_POST['action'] : '');
+
+if (!empty($_SESSION['admin_demo'])) {
+    if ($_SERVER['REQUEST_METHOD'] !== 'GET' || !in_array($action, ['stats', 'get_stats'], true)) {
+        http_response_code(403);
+        echo json_encode(['success' => false, 'error' => 'Read-only demo']);
+        exit;
+    }
+
+    echo json_encode([
+        'success' => true,
+        'total_orders' => 24,
+        'total_revenue' => '18450.00',
+        'pending' => 3,
+        'today' => 5,
+        'paid_revenue' => '12800.00',
+    ]);
+    exit;
+}
+
+require_once 'connect.php';
 
 switch ($action) {
 

@@ -1,4 +1,11 @@
 <?php
+session_start();
+header('Content-Type: application/json');
+if (!empty($_SESSION['admin_demo'])) {
+    $order_id = intval($_GET['order_id'] ?? 0);
+    echo json_encode(['payment' => $order_id === 2401 || $order_id === 2403 ? 'paid' : 'unpaid']);
+    exit;
+}
 require 'connect.php';
 
 $order_id = intval($_GET['order_id'] ?? 0);
